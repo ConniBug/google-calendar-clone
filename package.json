@@ -1,5 +1,5 @@
 {
-  "name": "google-calendar-clone-vanilla",
+  "name": "google-calendar-clone",
   "version": "1.0.0",
   "description": "zero dependency clone of google calendar written in vanilla javascript",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chaseottofy/google-calendar-clone-vanilla.git"
+    "url": "git+https://github.com/ConniBug/google-calendar-clone.git"
   },
   "keywords": [
     "google-calendar",
@@ -26,9 +26,9 @@
   "author": "chase ottofy",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/chaseottofy/google-calendar-clone-vanilla/issues"
+    "url": "https://github.com/ConniBug/google-calendar-clone/issues"
   },
-  "homepage": "https://github.com/chaseottofy/google-calendar-clone-vanilla#readme",
+  "homepage": "https://github.com/ConniBug/google-calendar-clone#readme",
   "devDependencies": {
     "compression-webpack-plugin": "^10.0.0",
     "css-loader": "^6.7.3",
@@ -45,5 +45,8 @@
     "webpack-dev-server": "^4.11.1",
     "webpack-manifest-plugin": "^5.0.0",
     "webpack-nano": "^1.1.1"
+  },
+  "dependencies": {
+    "terser-webpack-plugin": "^5.3.9"
   }
 }

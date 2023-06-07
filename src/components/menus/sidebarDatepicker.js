@@ -236,6 +236,7 @@ export default function setSidebarDatepicker(context, store, datepickerContext) 
   }
 
   function monthpickerSetMonth(val, init) {
+    console.log("Monthpicket Set Month");
     const newmonth = val;
 
     if (!init && newmonth === datepickerContext.getMonth()) return;

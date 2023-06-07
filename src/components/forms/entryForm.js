@@ -42,6 +42,7 @@ const entriesFormBody = document.querySelector(".entries__form--body");
 // title / description inputs
 const titleInput = document.querySelector(".form--body__title-input");
 const descriptionInput = document.querySelector(".form--body__description-input");
+const locationInput = document.querySelector(".form--body__location-input");
 
 // start date / time
 // end date / time
@@ -65,8 +66,10 @@ const formSubmitButton = document.querySelector(".form--footer__button-save");
 
 
 /**
- * function table of contents
- * I attempted to give a break down of the thought process / order of operations and by page 16 I realized this may well be the worst thing I have ever done.
+ * function table of contentsx
+ * I attempted to give a break down of the thought process / order of operations
+ *        and by page 16 I realized this may well be the worst thing I have ever done.
+ *
  * I am haunted by this mess.
  *  
  * 
@@ -393,12 +396,13 @@ export default function setEntryForm(context, store, datepickerContext) {
     ];
   }
 
-  function checkFormValidity(title, description, category, startDate, endDate) {
+  function checkFormValidity(title, description, location, category, startDate, endDate) {
     // all inputs are valid by default 
     // if any input becomes invalid, only the error message for that input will be returned through a error object defined below
     const status = {
       title: true,
       description: true,
+      location: true,
       startDate: true,
       endDate: true,
       valid: true,
@@ -421,6 +425,12 @@ export default function setEntryForm(context, store, datepickerContext) {
     /*  DESCRIPTION VALIDATION CHECK */
     if (description.length >= 200) {
       status.description = "Description must be less than 200 characters";
+      status.valid = false;
+    }
+    /* ***************************** */
+    /*  LOCATION VALIDATION CHECK */
+    if (location.length >= 100) {
+      status.description = "Location must be less than 100 characters";
       status.valid = false;
     }
     /* ************************** */
@@ -497,6 +507,7 @@ export default function setEntryForm(context, store, datepickerContext) {
     const components = {
       title: titleInput,
       description: descriptionInput,
+      location: locationInput,
       startDate: startDateInput,
       endDate: endDateInput,
     };
@@ -539,6 +550,7 @@ export default function setEntryForm(context, store, datepickerContext) {
         category: entryBefore.category,
         completed: entryBefore.completed,
         description: entryBefore.description,
+        location: entryBefore.location,
         end: new Date(entryBefore.end),
         id: id,
         start: start,
@@ -580,6 +592,7 @@ export default function setEntryForm(context, store, datepickerContext) {
     entriesForm.reset();
     descriptionInput.value = "";
     titleInput.value = "";
+    locationInput.value = "";
 
     if (categoryModalWrapper.classList.contains("category-modal-open")) {
       closeCategoryModal();
@@ -595,6 +608,8 @@ export default function setEntryForm(context, store, datepickerContext) {
   }
 
   function handleSubmissionRender(start, type, id, entryBefore) {
+    console.log("Handle submission render");
+
     context.setDate(start.getFullYear(), start.getMonth(), start.getDate());
     context.setDateSelected(start.getDate());
     setViews(currentComponent, context, store, datepickerContext);
@@ -634,51 +649,53 @@ export default function setEntryForm(context, store, datepickerContext) {
     e.preventDefault();
     const title = titleInput.value;
     const description = descriptionInput.value;
+    const location = locationInput.value;
     const [startDate, endDate] = configDatesForStore();
     const category = categoryModalWrapper.getAttribute("data-form-category");
 
     // if errors exist, validityStatus will represent an object with keys that match the input names, and values that represent the error messages as strings;
     // note that two types of submissions are possible: edit and create
     const validityStatus = checkFormValidity(
-      title, description, category, startDate, endDate,
+      title, description, location, category, startDate, endDate,
     );
 
     if (validityStatus !== true) {
       handleFormErrors(validityStatus);
       return;
-    } else {
-      // submission : edit
-      if (formSubmitButton.getAttribute("data-form-action") === "edit") {
-        const id = formSubmitButton.getAttribute("data-form-entry-id");
-        const entryBefore = JSON.parse(JSON.stringify(store.getEntry(id)));
-
-        store.updateEntry(
-          id,
-          {
-            category: category,
-            completed: false,
-            description: description,
-            end: endDate,
-            id: id,
-            start: startDate,
-            title: title,
-          }
-        );
-
-        handleSubmissionRender(
-          startDate, 'edit', id, entryBefore
-        );
-        return;
-      } else {
-        // submission : create
-        store.createEntry(
-          category, false, description, endDate, startDate, title
-        );
-        handleSubmissionRender(
-          startDate, 'create', store.getLastEntryId(), null
-        );
-      }
     }
+
+    // submission : edit
+    if (formSubmitButton.getAttribute("data-form-action") === "edit") {
+      const id = formSubmitButton.getAttribute("data-form-entry-id");
+      const entryBefore = JSON.parse(JSON.stringify(store.getEntry(id)));
+
+      store.updateEntry(
+        id,
+        {
+          category: category,
+          completed: false,
+          description: description,
+          location: location,
+          end: endDate,
+          id: id,
+          start: startDate,
+          title: title,
+        }
+      );
+
+      handleSubmissionRender(
+        startDate, 'edit', id, entryBefore
+      );
+      return;
+    }
+
+    // submission : create
+    store.createEntry(
+      category, false, description, endDate, startDate, title, location
+    );
+    handleSubmissionRender(
+      startDate, 'create', store.getLastEntryId(), null
+    );
   }
 
   function handleCategorySelection(e) {
@@ -976,28 +993,28 @@ export default function setEntryForm(context, store, datepickerContext) {
   function delegateFormKeyDown(e) {
     if (!datepicker.classList.contains("hide-datepicker")) {
       return;
-    } else {
-      const timep = document?.querySelector(".timepicker");
-      const catsAct = document?.querySelector(".hide-form-category-modal");
+    }
 
-      if (e.key === "Escape") {
-        if (timep !== null) {
-          closetimepicker();
-        } else if (catsAct === null) {
-          closeCategoryModal();
-        } else {
-          handleFormClose(e);
-        }
+    const timep = document?.querySelector(".timepicker");
+    const catsAct = document?.querySelector(".hide-form-category-modal");
+
+    if (e.key === "Escape") {
+      if (timep !== null) {
+        closetimepicker();
+      } else if (catsAct === null) {
+        closeCategoryModal();
+      } else {
+        handleFormClose(e);
       }
+    }
 
-      if (e.key === "Enter") {
-        if (timep !== null) {
-          closetimepicker();
-        } else if (catsAct === null) {
-          closeCategoryModal();
-        } else {
-          handleFormSubmission(e);
-        }
+    if (e.key === "Enter") {
+      if (timep !== null) {
+        closetimepicker();
+      } else if (catsAct === null) {
+        closeCategoryModal();
+      } else {
+        handleFormSubmission(e);
       }
     }
   }
@@ -1012,10 +1029,11 @@ export default function setEntryForm(context, store, datepickerContext) {
     day = context.getDay();
 
     // ****************************************** //
-    // title / description
+    // title / description / location
     descriptionInput.value = "";
     titleInput.blur();
     titleInput.value = "";
+    locationInput.value = "";
     setTimeout(() => {
       titleInput.focus();
     }, 10);

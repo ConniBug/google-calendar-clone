@@ -772,6 +772,8 @@ export default function setDayView(context, store, datepickerContext) {
   }
 
   const initDayView = () => {
+    console.log("Init Day View");
+
     dvSideGridWrapper.innerText = "";
     createDVSideGridCells();
     entries = store.getDayEntries(context.getDate());

@@ -5,16 +5,18 @@ import { generateId } from "../utilities/helpers";
  * @param {String} id - Unique identifier
  * @param {String} title
  * @param {String} description
+ * @param {String} location
  * @param {Date} start
  * @param {Date} end
  * @param {String} category
  * @param {Boolean} completed
  */
 export default class Entry {
-  constructor (category, completed, description, end, start, title) {
+  constructor (category, completed, description, end, start, title, location) {
     this.category = category;
     this.completed = completed;
     this.description = description;
+    this.location = location;
     this.end = end;
     this.id = generateId();
     this.start = start;
@@ -28,6 +30,7 @@ class CoordinateEntry {
     this.completed = completed || false;
     this.coordinates = coordinates || {};
     this.description = description;
+    this.location = location;
     this.id = id;
     this.title = title;
   }
@@ -78,15 +81,15 @@ class Week {
   }
 
   getBoxesByColumn(col) {
-    return this.boxes.filter(box => +box.coordinates.x == col);
+    return this.boxes.filter(box => +box.coordinates.x === col);
   }
 
   getBoxesByColumnTop(col) {
-    return this.boxesTop.filter(box => +box.coordinates.x == col);
+    return this.boxesTop.filter(box => +box.coordinates.x === col);
   }
 
   getBoxesTopByDay(day) {
-    return this.boxesTop.filter(box => +box.coordinates.y == day);
+    return this.boxesTop.filter(box => +box.coordinates.y === day);
   }
 
   getBoxesTopLengths() {

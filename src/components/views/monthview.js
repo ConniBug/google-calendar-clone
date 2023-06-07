@@ -198,6 +198,8 @@ export default function setMonthView(context, store, datepickerContext) {
   }
 
   function populateCells() {
+    console.log("Populate month cells");
+
     monthWrapper.innerText = "";
     let montharray = context.getMonthArray();
     let monthentries = store.getMonthEntries(montharray);
@@ -209,6 +211,12 @@ export default function setMonthView(context, store, datepickerContext) {
 
     const dayHasEntry = (day) => {
       const dayEntries = groupedEntries[day.getDate()];
+      if(dayEntries) {
+        console.log("----Month Cells----");
+        console.log("Day:", day);
+        console.log(dayEntries);
+        console.log("-------------------");
+      }
       return dayEntries !== undefined ? dayEntries : [];
     };
 

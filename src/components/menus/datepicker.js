@@ -35,10 +35,12 @@ export default function setDatepicker(context, store, datepickerContext, type) {
   }
 
   function createCells(montharray) {
+    console.log("Create cells");
+
     datepickerBody.innerText = "";
     let groupedEntries = store.getMonthEntryDates(montharray);
     let currentWeekStart = context.getWeek();
-    let isDaySelected = false;
+    // let isDaySelected = false;
 
     for (let i = 0; i < montharray.length; i++) {
       const cell = document.createElement("div");

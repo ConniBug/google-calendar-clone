@@ -229,6 +229,7 @@ class Store {
 
   // *******************
   static setStore(store) {
+    console.log("Setting state to", JSON.stringify(store));
     localStorage.setItem("store", JSON.stringify(store));
   }
 
@@ -252,49 +253,63 @@ class Store {
   /* ************** */
   /* essential crud (entries) - create, read, update, delete */
   addEntry(entry) {
+    console.log(`Add entry: ${JSON.stringify(entry)}`);
     this.store.push(entry);
     Store.setStore(this.store);
   }
 
   createEntry(...args) {
+    console.log(`Create entry`);
+    console.log(JSON.stringify(...args));
     this.addEntry(new Entry(...args));
     Store.setStore(this.store);
   }
 
   deleteEntry(id) {
+    console.log(`Delete entry: ${id}`);
     this.store = this.store.filter((entry) => entry.id !== id);
     Store.setStore(this.store);
   }
 
   getActiveEntries() {
+    console.log("Getting active entries");
     const active = this.getActiveCategories();
     if (!active) return [];
     const activeEntries = this.store.filter((entry) => {
       return active ? active.indexOf(entry.category) > -1 : [];
     });
+    console.log(activeEntries);
+    console.log("=======================");
     return activeEntries;
   }
 
   getEntry(id) {
-    return this.store.find((entry) => entry.id === id);
+    let entry = this.store.find((entry) => entry.id === id);
+    console.log(`Get entry: ${JSON.stringify(entry)}`);
+    return entry;
   }
 
   getEntries() {
+    console.log("Get entries");
     return this.store || [];
   }
 
   getEntriesByCtg(ctg) {
+    console.log("Get entries by ctg:");
     return this.store.filter((entry) => {
       return entry.category === ctg;
     });
   }
 
   removeLastEntry() {
+    console.log("Remove last entry");
     this.store.pop();
     Store.setStore(this.store);
   }
 
   getLastEntryId() {
+    console.log("Get last entry id");
+
     return this.store[this.store.length - 1].id;
   }
 
@@ -313,6 +328,8 @@ class Store {
   }
 
   updateEntry(id, data) {
+    console.log(`Update entry: ${id} with ${JSON.stringify(data)}`);
+
     let entry = this.getEntry(id);
     entry = Object.assign(entry, data);
     Store.setStore(this.store);
@@ -322,6 +339,8 @@ class Store {
   /* **************************** */
   /* (ENTRIES) FILTER/SORT/PARTITION/ */
   searchBy(entries, searchtype, value) {
+    console.log("Search by");
+
     if (entries.length === 0) return;
     return entries.filter((entry) => {
       return entry[searchtype].toLowerCase().slice(0, value.length) === value;
@@ -329,6 +348,8 @@ class Store {
   }
 
   sortBy(entries, type, direction) {
+    console.log("Sort by");
+
     if (entries.length === 0) return;
 
     if (direction === "desc") {
@@ -416,6 +437,9 @@ class Store {
   }
 
   getDayEntries(day) {
+    console.log("Get day entries");
+    console.log("Day:", day);
+
     let activeEntries = this.getActiveEntries();
     let boxes = {
       allDay: [], // entries that start on one day and end on another
@@ -452,6 +476,8 @@ class Store {
   }
 
   getDayEntriesArray(targetDate) {
+    console.log("Get day entries array");
+
     let activeEntries = this.getActiveEntries();
     if (activeEntries.length === 0) return [];
 
@@ -471,6 +497,7 @@ class Store {
   }
 
   getMonthEntries(montharr) {
+    console.log("Get month entries");
     let activeEntries = this.getActiveEntries();
     if (activeEntries.length === 0) return [];
 
@@ -483,6 +510,7 @@ class Store {
   }
 
   getMonthEntryDates(montharr) {
+    console.log("Get month entry dates");
     let entries = this.getMonthEntries(montharr);
     let grouped = {};
     entries.forEach((entry) => {
