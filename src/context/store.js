@@ -132,10 +132,10 @@ const colors = locales.colors;
 // Store is passed to all calendar views in the following order :
 // ./index > ./renderViews > ./setViews > component
 
-const api_url = "https://cal.transgirl.space/api";
+const api_url = "http://100.110.174.208:3000/api";
 const user = {
-  id: "",
-  token: "",
+  id: "7065257507584753665",
+  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNZW1iZXJJRCI6IjcwNjUyNTc1MDc1ODQ3NTM2NjUiLCJpYXQiOjE2ODY3Nzg0MTgsImV4cCI6MTY4NzM4MzIxOH0.r7zbA9z5qugRO5ulTEeHI2FYhNvO7Qa_Th-cezFxWKs",
 }
 console.log(user);
 
@@ -249,6 +249,7 @@ class Store {
     Store.setStore(this.store);
   }
 
+
   getStoreStats() {
     return [this.store.length, this.getAllCtgNames().length];
   }
@@ -319,6 +320,14 @@ class Store {
     //   "completed":false,
     // }
 
+    function request(path, method, user, body, callback) {
+      var requestOptions = {
+        method: method,
+        body: urlencoded,
+        redirect: 'follow'
+      };
+    }
+
     var urlencoded = new URLSearchParams();
     urlencoded.append("title", entry.title);
     urlencoded.append("description", entry.description);
@@ -332,6 +341,7 @@ class Store {
       body: urlencoded,
       redirect: 'follow',
       headers: {authorization: `Bearer ${user.token}`},
+
     };
 
     fetch(api_url + "/member/" + user.id + "/calander/1", requestOptions)
@@ -343,6 +353,7 @@ class Store {
           this.store.push(entry);
           Store.setStore(this.store);
           renderViews(context, datepickerContext, this);
+
         })
         .catch(error => console.log('error', error));
   }
