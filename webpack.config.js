@@ -2,6 +2,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
+
 // const BundelAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // "analyze": "webpack --profile --json > stats.json"
 const TerserPlugin = require("terser-webpack-plugin");
@@ -14,7 +16,9 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'dist'),
     },
-    port: 40000,
+    host: '0.0.0.0',
+    port: 30000,
+    allowedHosts: 'all',
     open: true,
     hot: true,
     compress: true,
@@ -64,6 +68,13 @@ module.exports = {
         basePath: 'dist/',
       }
     ),
+    new WorkboxPlugin.GenerateSW({
+      // these options encourage the ServiceWorkers to get in there fast
+      // and not allow any straggling "old" SWs to hang around
+
+      clientsClaim: true,
+      skipWaiting: true,
+    }),
   ],
 
   optimization: {
