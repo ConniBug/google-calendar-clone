@@ -3,6 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
+const WebpackPwaManifest = require('webpack-pwa-manifest')
 
 // const BundelAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // "analyze": "webpack --profile --json > stats.json"
@@ -75,6 +76,19 @@ module.exports = {
       clientsClaim: true,
       skipWaiting: true,
     }),
+    new WebpackPwaManifest(
+        {
+          name: "Calander",
+          orientation: "portrait",
+          display: "standalone",
+          start_url: ".",
+          inject: true,
+          fingerprints: true,
+          ios: true,
+          publicPath: "/",
+          includeDirectory: true
+        }
+    )
   ],
 
   optimization: {
