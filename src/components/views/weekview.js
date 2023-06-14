@@ -332,6 +332,7 @@ export default function setWeekView(context, store, datepickerContext) {
   }
 
   function openAllDayModal(e, cell) {
+    console.log("openAllDayModal");
     const col = cell.parentElement;
     cell.classList.add("allday-modal__cell--open");
     cell.firstChild.firstChild.style.backgroundColor = "#01635b";

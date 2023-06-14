@@ -3,6 +3,8 @@ import localStoreKeyNames from "./constants";
 import { testDate, compareDates } from "../utilities/dateutils";
 import locales from "../locales/en";
 import defautlKeyboardShortcuts from "../locales/kbDefault";
+import renderViews from "../config/renderViews";
+import context, {datepickerContext} from "./appContext";
 const colors = locales.colors;
 /*
   this is a temporary list of store methods for development purposes, it is not a complete list of methods
@@ -130,19 +132,31 @@ const colors = locales.colors;
 // Store is passed to all calendar views in the following order :
 // ./index > ./renderViews > ./setViews > component
 
+const api_url = "https://cal.transgirl.space/api";
+const user = {
+  id: "",
+  token: "",
+}
+console.log(user);
+
 class Store {
-  constructor () {
+
+  constructor() {
+    console.log("Setting up storage");
+
     this.store = localStorage.getItem("store")
-      ? JSON.parse(localStorage.getItem("store"))
-      : [];
+        ? JSON.parse(localStorage.getItem("store"))
+        : [];
+
+    console.log("Current store:", this.store);
 
     this.userUpload;
 
     this.ctg = localStorage.getItem("ctg")
-      ? JSON.parse(localStorage.getItem("ctg"))
-      : {
-        default: { color: colors.blue[4], active: true },
-      };
+        ? JSON.parse(localStorage.getItem("ctg"))
+        : {
+          default: {color: colors.blue[4], active: true},
+        };
 
     this.activeOverlay = new Set();
 
@@ -186,6 +200,48 @@ class Store {
     this.keyboardShortcuts = defautlKeyboardShortcuts;
     this.keyboardShortcutsStatus = true;
     this.animationStatus = true;
+
+    this.setup();
+  }
+  async setup() {
+    // const params = "1?limit=1&title=test&description=tyyyu"
+
+    let requestOptions = {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {authorization: `Bearer ${user.token}`},
+    };
+
+    console.log("before");
+
+    fetch(api_url + "/member/" + user.id + "/calander/1", requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          console.log("Server events");
+          let json = JSON.parse(result);
+          console.log(json);
+          let build = [];
+          json.forEach(e => {
+            build.push({
+              "id": e.id,
+              "category": "default",
+              "completed": false,
+              "description": e.description,
+              "location": e.location || "N/A",
+              "start":  e.eventStart,
+              "end":  e.eventEnd,
+              "title": e.title
+            })
+          });
+          this.store = build;
+          console.log("Build is equal to ", build);
+          renderViews(context, datepickerContext, this);
+          var overlay = document.getElementById('overlay');
+          overlay.style.display = 'none';
+        })
+        .catch(error => console.log('error', error));
+
+    console.log("after");
   }
 
   setStoreForTesting(store) {
@@ -254,8 +310,41 @@ class Store {
   /* essential crud (entries) - create, read, update, delete */
   addEntry(entry) {
     console.log(`Add entry: ${JSON.stringify(entry)}`);
-    this.store.push(entry);
-    Store.setStore(this.store);
+
+
+    // TODO: Implement category and whatever completed is
+    //
+    // entry = {
+    //   "category":"default",
+    //   "completed":false,
+    // }
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("title", entry.title);
+    urlencoded.append("description", entry.description);
+    urlencoded.append("location", entry.location);
+    urlencoded.append("id", entry.id);
+    urlencoded.append("end", entry.end);
+    urlencoded.append("start", entry.start);
+
+    var requestOptions = {
+      method: 'POST',
+      body: urlencoded,
+      redirect: 'follow',
+      headers: {authorization: `Bearer ${user.token}`},
+    };
+
+    fetch(api_url + "/member/" + user.id + "/calander/1", requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          console.log("New event ID: ", result);
+          entry.id = result.id;
+
+          this.store.push(entry);
+          Store.setStore(this.store);
+          renderViews(context, datepickerContext, this);
+        })
+        .catch(error => console.log('error', error));
   }
 
   createEntry(...args) {
@@ -461,6 +550,7 @@ class Store {
     });
 
     dayEntries.forEach((entry) => {
+      console.log("Day entries");
       entry.coordinates = this.generateCoordinates(
         new Date(entry.start),
         new Date(entry.end)
@@ -1026,3 +1116,4 @@ class Store {
 
 // single
 export default new Store();
+

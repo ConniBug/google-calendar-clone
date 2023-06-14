@@ -201,11 +201,14 @@ export default function setMonthView(context, store, datepickerContext) {
     console.log("Populate month cells");
 
     monthWrapper.innerText = "";
-    let montharray = context.getMonthArray();
-    let monthentries = store.getMonthEntries(montharray);
-    let groupedEntries = store.getGroupedMonthEntries(monthentries);
+    let months = context.getMonthArray();
+    let monthEntries = store.getMonthEntries(months);
+    let groupedEntries = store.getGroupedMonthEntries(monthEntries);
+    // console.log(months);
+    // console.log(monthEntries);
+    // console.log(groupedEntries);
 
-    montharray.length < 42
+    months.length < 42
       ? monthWrapper.classList.add("five-weeks")
       : monthWrapper.classList.remove("five-weeks");
 
@@ -220,12 +223,12 @@ export default function setMonthView(context, store, datepickerContext) {
       return dayEntries !== undefined ? dayEntries : [];
     };
 
-    montharray.forEach((day, idx) => {
+    months.forEach((day, idx) => {
       createCell(day, idx, dayHasEntry(day), getDateFormatted(day));
     });
 
-    montharray = null;
-    monthentries = null;
+    months = null;
+    monthEntries = null;
     groupedEntries = null;
   }
 

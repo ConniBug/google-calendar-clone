@@ -24,6 +24,8 @@ import "./styles/dayview.css";
 import "./styles/listview.css";
 import "./styles/sidebar.css";
 import "./styles/sbdatepicker.css";
+
+import "./styles/overlay_connecting.css"
 // </main>
 
 // <aside>
@@ -41,6 +43,15 @@ import "./styles/aside/entryOptions.css";
 import "./styles/aside/info.css";
 import "./styles/aside/shortcuts.css";
 // </aside>
+
+// function showOverlay() {
+//     var overlay = document.getElementById('overlay');
+//     overlay.style.display = 'flex';
+// }
+// function hideOverlay() {
+//     var overlay = document.getElementById('overlay');
+//     overlay.style.display = 'none';
+// }
 
 /*!*************************************!*/
 setAppDefaults(context, store);

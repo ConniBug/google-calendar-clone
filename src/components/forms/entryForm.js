@@ -646,6 +646,8 @@ export default function setEntryForm(context, store, datepickerContext) {
   }
 
   function handleFormSubmission(e) {
+    console.log("Start handling form submission");
+
     e.preventDefault();
     const title = titleInput.value;
     const description = descriptionInput.value;
@@ -696,6 +698,8 @@ export default function setEntryForm(context, store, datepickerContext) {
     handleSubmissionRender(
       startDate, 'create', store.getLastEntryId(), null
     );
+
+    console.log("Finished handling form submission");
   }
 
   function handleCategorySelection(e) {

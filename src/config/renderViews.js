@@ -430,6 +430,7 @@ export default function renderViews(context, datepickerContext, store) {
     const select = getClosest(e, ".select__modal");
 
     if (btnMainMenu) {
+      console.log("Handle search view");
       context.toggleSidebarState();
       handleBtnMainMenu();
       return;
@@ -456,16 +457,19 @@ export default function renderViews(context, datepickerContext, store) {
     }
 
     if (search) {
+      console.log("Handle search view");
       createGoTo(context, store, datepickerContext);
       return;
     }
 
     if (settings) {
+      console.log("Handle settings view");
       handleToggleSubmenu(e);
       return;
     }
 
     if (select) {
+      console.log("Handle select view");
       handleSelect(e);
       return;
     }
