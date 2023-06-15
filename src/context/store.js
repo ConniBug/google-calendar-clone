@@ -156,9 +156,9 @@ function request_get(path, callback_result, authed = true, callback_error = null
               if(json.error === "Un-Authorised!") {
                 return "Un-Authorised!"
               }
-              callback_result(result);
+              callback_result.call(this, result);
             } else {
-              callback_result(result);
+              callback_result.call(this, result);
             }
           });
     } catch (e) {
@@ -183,9 +183,9 @@ function request_body(path, body, callback_result, method = 'POST', authed = tru
               if (json.error === "Un-Authorised!") {
                 return "Un-Authorised!"
               }
-              callback_result(result);
+              callback_result.call(this, result);
             } else {
-              callback_result(result);
+              callback_result.call(this, result);
             }
           });
     } catch (e) {
