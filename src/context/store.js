@@ -284,8 +284,12 @@ class Store {
       this.store = build;
       console.log("Build is equal to ", build);
       renderViews(context, datepickerContext, this);
-      var overlay = document.getElementById('overlay');
-      overlay.style.display = 'none';
+
+      let overlay = document.getElementById('overlay'); overlay.style.display = 'none';
+          overlay = document.getElementById('overlay_blank');overlay.style.display = 'none';
+
+      const login_container = document.getElementById('login_page-container');
+      login_container.style.display = 'none';
     }, true);
 
   }
@@ -374,7 +378,7 @@ class Store {
     urlencoded.append("end", entry.end);
     urlencoded.append("start", entry.start);
 
-    request_body.call(this, "/member/" + user.id + "/calander/1", urlencoded, function (result) {
+    request_body.call(this, "/member/" + this.user.id + "/calander/1", urlencoded, function (result) {
       console.log("New event ID: ", result);
       entry.id = result.id;
 
@@ -382,7 +386,6 @@ class Store {
       Store.setStore(this.store);
       renderViews(context, datepickerContext, this);
     });
-
   }
 
   createEntry(...args) {
@@ -399,7 +402,7 @@ class Store {
     urlencoded.append("EventID", delete_id);
 
 
-    request_body.call(this,"/member/" + user.id + "/calander/1", urlencoded, function (result) {
+    request_body.call(this,"/member/" + this.user.id + "/calander/1", urlencoded, function (result) {
       console.log("Delete status: ", result);
 
       this.store = this.store.filter((entry) => entry.id !== delete_id);
