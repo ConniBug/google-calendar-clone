@@ -132,12 +132,52 @@ const colors = locales.colors;
 // Store is passed to all calendar views in the following order :
 // ./index > ./renderViews > ./setViews > component
 
-const api_url = "http://100.110.174.208:3000/api";
+const api_url = "https://api-cal.transgirl.space/api";
 const user = {
   id: "7065257507584753665",
   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNZW1iZXJJRCI6IjcwNjUyNTc1MDc1ODQ3NTM2NjUiLCJpYXQiOjE2ODY3Nzg0MTgsImV4cCI6MTY4NzM4MzIxOH0.r7zbA9z5qugRO5ulTEeHI2FYhNvO7Qa_Th-cezFxWKs",
 }
 console.log(user);
+
+// class Session {
+async function request_get(path, callback_result, authed = true, callback_error = null) {
+    let requestOptions = {
+      method: 'GET',
+      redirect: 'follow',
+    };
+    if(authed)
+      requestOptions.headers = {authorization: `Bearer ${user.token}`};
+
+    await fetch(api_url + path, requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          callback_result(result);
+        })
+        .catch(error => {
+          // console.error(error);
+          console.error(error.message);
+        });
+  }
+async function request_body(path, body, callback_result, method = 'POST', authed = true, callback_error = null) {
+    let requestOptions = {
+      method: method,
+      body: body,
+      redirect: 'follow',
+    };
+    if(authed)
+      requestOptions.headers = {authorization: `Bearer ${user.token}`};
+
+    await fetch(api_url + path, requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          callback_result(result);
+        })
+        .catch(error => {
+          // console.error(error);
+          console.error(error.message);
+        });
+  }
+// }
 
 class Store {
 
@@ -201,48 +241,32 @@ class Store {
     this.keyboardShortcutsStatus = true;
     this.animationStatus = true;
 
-    this.setup();
-  }
-  async setup() {
-    // const params = "1?limit=1&title=test&description=tyyyu"
-
-    let requestOptions = {
-      method: 'GET',
-      redirect: 'follow',
-      headers: {authorization: `Bearer ${user.token}`},
-    };
-
-    console.log("before");
-
-    fetch(api_url + "/member/" + user.id + "/calander/1", requestOptions)
-        .then(response => response.text())
-        .then(result => {
-          console.log("Server events");
-          let json = JSON.parse(result);
-          console.log(json);
-          let build = [];
-          json.forEach(e => {
-            build.push({
-              "id": e.id,
-              "category": "default",
-              "completed": false,
-              "description": e.description,
-              "location": e.location || "N/A",
-              "start":  e.eventStart,
-              "end":  e.eventEnd,
-              "title": e.title
-            })
-          });
-          this.store = build;
-          console.log("Build is equal to ", build);
-          renderViews(context, datepickerContext, this);
-          var overlay = document.getElementById('overlay');
-          overlay.style.display = 'none';
+    request_get("/member/" + user.id + "/calander/1", function (result) {
+      console.log("Server events");
+      let json = JSON.parse(result);
+      console.log(json);
+      let build = [];
+      json.forEach(e => {
+        build.push({
+          "id": e.id,
+          "category": "default",
+          "completed": false,
+          "description": e.description,
+          "location": e.location || "N/A",
+          "start":  e.eventStart,
+          "end":  e.eventEnd,
+          "title": e.title
         })
-        .catch(error => console.log('error', error));
+      });
+      this.store = build;
+      console.log("Build is equal to ", build);
+      renderViews(context, datepickerContext, this);
+      var overlay = document.getElementById('overlay');
+      overlay.style.display = 'none';
+    }, true);
 
-    console.log("after");
   }
+
 
   setStoreForTesting(store) {
     this.store = store;
@@ -312,21 +336,12 @@ class Store {
   addEntry(entry) {
     console.log(`Add entry: ${JSON.stringify(entry)}`);
 
-
     // TODO: Implement category and whatever completed is
     //
     // entry = {
     //   "category":"default",
     //   "completed":false,
     // }
-
-    function request(path, method, user, body, callback) {
-      var requestOptions = {
-        method: method,
-        body: urlencoded,
-        redirect: 'follow'
-      };
-    }
 
     var urlencoded = new URLSearchParams();
     urlencoded.append("title", entry.title);
@@ -336,26 +351,14 @@ class Store {
     urlencoded.append("end", entry.end);
     urlencoded.append("start", entry.start);
 
-    var requestOptions = {
-      method: 'POST',
-      body: urlencoded,
-      redirect: 'follow',
-      headers: {authorization: `Bearer ${user.token}`},
+    request_body("/member/" + user.id + "/calander/1", urlencoded, function (result) {
+      console.log("New event ID: ", result);
+      entry.id = result.id;
 
-    };
-
-    fetch(api_url + "/member/" + user.id + "/calander/1", requestOptions)
-        .then(response => response.text())
-        .then(result => {
-          console.log("New event ID: ", result);
-          entry.id = result.id;
-
-          this.store.push(entry);
-          Store.setStore(this.store);
-          renderViews(context, datepickerContext, this);
-
-        })
-        .catch(error => console.log('error', error));
+      this.store.push(entry);
+      Store.setStore(this.store);
+      renderViews(context, datepickerContext, this);
+    });
   }
 
   createEntry(...args) {
@@ -365,10 +368,19 @@ class Store {
     Store.setStore(this.store);
   }
 
-  deleteEntry(id) {
-    console.log(`Delete entry: ${id}`);
-    this.store = this.store.filter((entry) => entry.id !== id);
-    Store.setStore(this.store);
+  deleteEntry(delete_id) {
+    console.log(`Delete entry: ${delete_id}`);
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("EventID", delete_id);
+
+    request_body("/member/" + user.id + "/calander/1", urlencoded, function (result) {
+      console.log("Delete status: ", result);
+
+      this.store = this.store.filter((entry) => entry.id !== delete_id);
+      Store.setStore(this.store);
+      renderViews(context, datepickerContext, this);
+    }, 'DELETE');
   }
 
   getActiveEntries() {

@@ -79,6 +79,10 @@ module.exports = {
     new WebpackPwaManifest(
         {
           name: "Calander",
+          short_name: "GCal",
+          description: "Lil gcal clone",
+          background_color: '#e5bdff',
+          theme_color: '#2d2d2d',
           orientation: "portrait",
           display: "standalone",
           start_url: ".",
@@ -86,7 +90,21 @@ module.exports = {
           fingerprints: true,
           ios: true,
           publicPath: "/",
-          includeDirectory: true
+          includeDirectory: true,
+
+          icons: [
+            {
+              src: path.resolve('src/assets/logo.svg'),
+              sizes: [96, 128, 192, 256, 384, 512],
+              type: "image/svg",
+            },
+            {
+              src: path.resolve('src/assets/logo.svg'),
+              sizes: [96, 128, 192, 256, 384, 512],
+              type: "image/svg",
+              purpose: 'maskable',
+            }
+          ],
         }
     )
   ],
