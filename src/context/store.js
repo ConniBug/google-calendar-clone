@@ -151,7 +151,15 @@ async function request_get(path, callback_result, authed = true, callback_error 
     await fetch(api_url + path, requestOptions)
         .then(response => response.text())
         .then(result => {
-          callback_result(result);
+          if(authed) {
+            let json = JSON.parse(result);
+            if(json.error === "Un-Authorised!") {
+              return "Un-Authorised!"
+            }
+            callback_result(result);
+          } else {
+            callback_result(result);
+          }
         })
         .catch(error => {
           // console.error(error);
@@ -170,7 +178,15 @@ async function request_body(path, body, callback_result, method = 'POST', authed
     await fetch(api_url + path, requestOptions)
         .then(response => response.text())
         .then(result => {
-          callback_result(result);
+          if(authed) {
+            let json = JSON.parse(result);
+            if(json.error === "Un-Authorised!") {
+              return "Un-Authorised!"
+            }
+            callback_result(result);
+          } else {
+            callback_result(result);
+          }
         })
         .catch(error => {
           // console.error(error);
