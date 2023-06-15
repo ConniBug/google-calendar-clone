@@ -36,9 +36,9 @@
         <input id="password" type="password" placeholder="Password" class="form--body__title-input" maxlength="50" spellcheck="false" required="">
       </div>
       <script>
-        function request_body(path, body, callback_result, method = 'POST') {
+        function request_body(path, body, callback_result) {
           let requestOptions = {
-            method: method,
+            method: 'POST',
             body: body,
             redirect: 'follow',
           };
