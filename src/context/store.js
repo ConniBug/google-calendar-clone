@@ -155,7 +155,7 @@ async function request_get(path, callback_result, authed = true, callback_error 
         })
         .catch(error => {
           // console.error(error);
-          console.error(error.message);
+          console.error(error);
         });
   }
 async function request_body(path, body, callback_result, method = 'POST', authed = true, callback_error = null) {
@@ -174,7 +174,7 @@ async function request_body(path, body, callback_result, method = 'POST', authed
         })
         .catch(error => {
           // console.error(error);
-          console.error(error.message);
+          console.error(error);
         });
   }
 // }
