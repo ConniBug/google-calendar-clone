@@ -26,7 +26,7 @@
     <div class="overlay-content"></div>
   </div>
 
-  <div id="login_page-container" style="display: block">
+  <div id="login_page-container" style="display: none">
     <div id="popup" class="popup" style="width: 33%">
       <h2>Login</h2>
       <div class="form--body__title form-body-single" style="width: auto;">
@@ -71,9 +71,9 @@
 
             localStorage.setItem('user', JSON.stringify(data));
 
-            const login_container = document.getElementById('login_page-container');
             var overlay = document.getElementById('overlay');
             overlay.style.display = 'none';
+            const login_container = document.getElementById('login_page-container');
             login_container.style.display = 'none';
 
           }, true);

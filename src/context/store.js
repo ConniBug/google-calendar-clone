@@ -154,6 +154,10 @@ function request_get(path, callback_result, authed = true, callback_error = null
             if(authed) {
               let json = JSON.parse(result);
               if(json.error === "Un-Authorised!") {
+                const login_container = document.getElementById('login_page-container');
+                login_container.style.display = 'block';
+
+
                 return "Un-Authorised!"
               }
               callback_result.call(this, result);
@@ -263,6 +267,8 @@ class Store {
       localStorage.setItem("user", str);
     }
     this.user = JSON.parse(localStorage.getItem("user"));
+
+    // if(this.user.expiry )
 
     request_get.call(this, "/member/" + this.user.id + "/calander/1", function (result) {
       console.log("Server events");
