@@ -132,66 +132,65 @@ const colors = locales.colors;
 // Store is passed to all calendar views in the following order :
 // ./index > ./renderViews > ./setViews > component
 
-const api_url = "https://api-cal.transgirl.space/api";
-const user = {
-  id: "7065257507584753665",
-  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNZW1iZXJJRCI6IjcwNjUyNTc1MDc1ODQ3NTM2NjUiLCJpYXQiOjE2ODY3Nzg0MTgsImV4cCI6MTY4NzM4MzIxOH0.r7zbA9z5qugRO5ulTEeHI2FYhNvO7Qa_Th-cezFxWKs",
-}
-console.log(user);
+// const api_url = "https://api-cal.transgirl.space/api";
+// const user = {
+//   id: "7065257507584753665",
+//   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNZW1iZXJJRCI6IjcwNjUyNTc1MDc1ODQ3NTM2NjUiLCJpYXQiOjE2ODY3Nzg0MTgsImV4cCI6MTY4NzM4MzIxOH0.r7zbA9z5qugRO5ulTEeHI2FYhNvO7Qa_Th-cezFxWKs",
+// }
 
 // class Session {
-async function request_get(path, callback_result, authed = true, callback_error = null) {
+function request_get(path, callback_result, authed = true, callback_error = null) {
     let requestOptions = {
       method: 'GET',
       redirect: 'follow',
     };
     if(authed)
-      requestOptions.headers = {authorization: `Bearer ${user.token}`};
+      requestOptions.headers = {authorization: `Bearer ${this.user.token}`};
 
-    await fetch(api_url + path, requestOptions)
-        .then(response => response.text())
-        .then(result => {
-          if(authed) {
-            let json = JSON.parse(result);
-            if(json.error === "Un-Authorised!") {
-              return "Un-Authorised!"
+    try {
+      fetch(this.api_url + path, requestOptions)
+          .then(response => response.text())
+          .then(result => {
+            if(authed) {
+              let json = JSON.parse(result);
+              if(json.error === "Un-Authorised!") {
+                return "Un-Authorised!"
+              }
+              callback_result(result);
+            } else {
+              callback_result(result);
             }
-            callback_result(result);
-          } else {
-            callback_result(result);
-          }
-        })
-        .catch(error => {
-          // console.error(error);
-          console.error(error);
-        });
+          });
+    } catch (e) {
+      console.log(e);
+    }
   }
-async function request_body(path, body, callback_result, method = 'POST', authed = true, callback_error = null) {
+function request_body(path, body, callback_result, method = 'POST', authed = true, callback_error = null) {
     let requestOptions = {
       method: method,
       body: body,
       redirect: 'follow',
     };
     if(authed)
-      requestOptions.headers = {authorization: `Bearer ${user.token}`};
+      requestOptions.headers = {authorization: `Bearer ${this.user.token}`};
 
-    await fetch(api_url + path, requestOptions)
-        .then(response => response.text())
-        .then(result => {
-          if(authed) {
-            let json = JSON.parse(result);
-            if(json.error === "Un-Authorised!") {
-              return "Un-Authorised!"
+    try {
+      fetch(this.api_url + path, requestOptions)
+          .then(response => response.text())
+          .then(result => {
+            if (authed) {
+              let json = JSON.parse(result);
+              if (json.error === "Un-Authorised!") {
+                return "Un-Authorised!"
+              }
+              callback_result(result);
+            } else {
+              callback_result(result);
             }
-            callback_result(result);
-          } else {
-            callback_result(result);
-          }
-        })
-        .catch(error => {
-          // console.error(error);
-          console.error(error);
-        });
+          });
+    } catch (e) {
+      console.log(e);
+    }
   }
 // }
 
@@ -257,7 +256,15 @@ class Store {
     this.keyboardShortcutsStatus = true;
     this.animationStatus = true;
 
-    request_get.call(this, "/member/" + user.id + "/calander/1", function (result) {
+    this.api_url = localStorage.getItem("api_url");
+
+    if(!localStorage.getItem("user")) {
+      let str = JSON.stringify({ id: "123", token: "321"});
+      localStorage.setItem("user", str);
+    }
+    this.user = JSON.parse(localStorage.getItem("user"));
+
+    request_get.call(this, "/member/" + this.user.id + "/calander/1", function (result) {
       console.log("Server events");
       let json = JSON.parse(result);
       console.log(json);
