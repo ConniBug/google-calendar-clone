@@ -241,7 +241,7 @@ class Store {
     this.keyboardShortcutsStatus = true;
     this.animationStatus = true;
 
-    request_get("/member/" + user.id + "/calander/1", function (result) {
+    request_get.call(this, "/member/" + user.id + "/calander/1", function (result) {
       console.log("Server events");
       let json = JSON.parse(result);
       console.log(json);
@@ -351,7 +351,7 @@ class Store {
     urlencoded.append("end", entry.end);
     urlencoded.append("start", entry.start);
 
-    request_body("/member/" + user.id + "/calander/1", urlencoded, function (result) {
+    request_body.call(this, "/member/" + user.id + "/calander/1", urlencoded, function (result) {
       console.log("New event ID: ", result);
       entry.id = result.id;
 
@@ -359,6 +359,7 @@ class Store {
       Store.setStore(this.store);
       renderViews(context, datepickerContext, this);
     });
+
   }
 
   createEntry(...args) {
@@ -374,7 +375,8 @@ class Store {
     var urlencoded = new URLSearchParams();
     urlencoded.append("EventID", delete_id);
 
-    request_body("/member/" + user.id + "/calander/1", urlencoded, function (result) {
+
+    request_body.call(this,"/member/" + user.id + "/calander/1", urlencoded, function (result) {
       console.log("Delete status: ", result);
 
       this.store = this.store.filter((entry) => entry.id !== delete_id);
