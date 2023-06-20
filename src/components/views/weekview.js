@@ -359,7 +359,7 @@ export default function setWeekView(context, store, datepickerContext) {
     const setup = new FormSetup();
 
     const [submitType, id, title, description] = type;
-    setup.setSubmission(submitType, id, title, description);
+    setup.setSubmission(submitType, id, title, description, location);
     if (submitType === "create") { box.style.opacity = 0.9; }
 
     const [categoryName, color] = category;
@@ -392,7 +392,7 @@ export default function setWeekView(context, store, datepickerContext) {
 
     store.setFormResetHandle("week", handleCloseCallback);
     const setup = new FormSetup();
-    setup.setSubmission("edit", id, entry.title, entry.description);
+    setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
     setup.setCategory(entry.category, color);
     setup.setDates(getFormDateObject(start, entry.end));
     fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);
@@ -525,7 +525,7 @@ export default function setWeekView(context, store, datepickerContext) {
         store.setFormResetHandle("week", setResetWv);
 
         const setup = new FormSetup();
-        setup.setSubmission("edit", id, entry.title, entry.description);
+        setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
         setup.setCategory(entry.category, color);
         setup.setDates(getFormDateObject(start, entry.end));
         fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);

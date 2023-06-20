@@ -39,7 +39,7 @@ export default function handleSidebarCategories(context, store, datepickerContex
     const keys = Object.keys(ctg);
     for (let i = 0; i < keys.length; i++) {
       let [ctgname, color, status] = [
-        keys[i],
+        ctg[keys[i]].name,
         ctg[keys[i]].color,
         ctg[keys[i]].active
       ];
@@ -64,6 +64,8 @@ export default function handleSidebarCategories(context, store, datepickerContex
     checkbox.classList.add('sbch-form--item__checkbox');
     checkbox.setAttribute("data-sbch-checked", `${status}`);
     checkbox.setAttribute("data-sbch-category", ctgname);
+
+    console.log("Create category list item: ", ctgname, ctgcolor, status);
     
     let checkIcon;
     if (status) {
@@ -128,6 +130,8 @@ export default function handleSidebarCategories(context, store, datepickerContex
     const offsetColor = ctgcolor;
     const categoryLength = store.getCtgLength(ctgname);
     let noEntries = false;
+
+    console.log("Create delete category popup: ", ctgname, ctgcolor, categoryLength);
 
     // POPUP OVERLAY
     const popupBoxOverlay = document.createElement("aside");
@@ -303,7 +307,8 @@ export default function handleSidebarCategories(context, store, datepickerContex
   function handleCategorySelection(e) {
     let checkbox = e.target.children[0].children[0];
     let status = checkbox.getAttribute("data-sbch-checked");
-    let cat = checkbox.getAttribute("data-sbch-category");
+    let cat_title = checkbox.getAttribute("data-sbch-category");
+    let cat = store.getCtgID(cat_title);
     let color = store.getCtgColor(cat);
     if (status === "true") {
       checkbox.setAttribute("data-sbch-checked", "false");

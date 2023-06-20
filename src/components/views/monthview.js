@@ -727,8 +727,11 @@ export default function setMonthView(context, store, datepickerContext) {
 
   function openFormOnClickMV(box, cell) {
     const id = box.getAttribute("data-monthview-id");
+    console.log(id);
     const entry = store.getEntry(id);
+    console.log(entry);
     const start = entry.start;
+    console.log(start);
     const color = store.getCtgColor(entry.category);
     const offsetColor = hextorgba(color, 0.5);
     cell.classList.add("monthview--daycontent__form-temp");
@@ -745,7 +748,7 @@ export default function setMonthView(context, store, datepickerContext) {
     store.setFormResetHandle("month", handleMonthviewEditFormClose);
 
     const setup = new FormSetup();
-    setup.setSubmission("edit", id, entry.title, entry.description);
+    setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
     setup.setCategory(entry.category, color);
     setup.setDates(getFormDateObject(start, entry.end));
 
@@ -808,7 +811,7 @@ export default function setMonthView(context, store, datepickerContext) {
       const openForm = store.getRenderFormCallback();
       const setup = new FormSetup();
 
-      setup.setSubmission("create", null, null, null);
+      setup.setSubmission("create", null, null, null, null);
       setup.setCategory(tempctg, color);
       setup.setDates(getFormDateObject(start, end));
 

@@ -157,7 +157,6 @@ function request_get(path, callback_result, authed = true, callback_error = null
                 const login_container = document.getElementById('login_page-container');
                 login_container.style.display = 'block';
 
-
                 return "Un-Authorised!"
               }
               callback_result.call(this, result);
@@ -201,20 +200,20 @@ function request_body(path, body, callback_result, method = 'POST', authed = tru
 class Store {
 
   constructor() {
-    console.log("Setting up storage");
+    // console.log("Setting up storage");
 
     this.store = localStorage.getItem("store")
         ? JSON.parse(localStorage.getItem("store"))
         : [];
 
-    console.log("Current store:", this.store);
+    // console.log("Current store:", this.store);
 
     this.userUpload;
 
     this.ctg = localStorage.getItem("ctg")
         ? JSON.parse(localStorage.getItem("ctg"))
         : {
-          default: {color: colors.blue[4], active: true},
+          default: {name: "default", color: colors.blue[4], active: true},
         };
 
     this.activeOverlay = new Set();
@@ -263,17 +262,23 @@ class Store {
     this.api_url = localStorage.getItem("api_url");
 
     if(!localStorage.getItem("user")) {
-      let str = JSON.stringify({ id: "123", token: "321"});
+      let str = JSON.stringify({ id: "123", token: "321", expiry: 0 });
       localStorage.setItem("user", str);
     }
     this.user = JSON.parse(localStorage.getItem("user"));
 
-    // if(this.user.expiry )
+    if(this.user.expiry < Date.now() / 1000) {
+        console.warn("Token expired, any changes will not be saved.");
+    } else {
+        console.log("Token is valid, logged in fine.");
+    }
 
+    // TODO: Ensure the user cant create new events when not logged in. nor update them etc.
+    this.store.online_ready = false;
     request_get.call(this, "/member/" + this.user.id + "/calander/1", function (result) {
-      console.log("Server events");
+      // console.log("Server events");
       let json = JSON.parse(result);
-      console.log(json);
+      console.log("Server updated events list - ", json);
       let build = [];
       json.forEach(e => {
         build.push({
@@ -286,10 +291,13 @@ class Store {
           "end":  e.eventEnd,
           "title": e.title
         })
+        this.store.online_ready = true;
       });
       this.store = build;
-      console.log("Build is equal to ", build);
+      // console.log("Build is equal to ", build);
       renderViews(context, datepickerContext, this);
+
+
 
       let overlay = document.getElementById('overlay'); overlay.style.display = 'none';
           overlay = document.getElementById('overlay_blank');overlay.style.display = 'none';
@@ -343,7 +351,7 @@ class Store {
 
   // *******************
   static setStore(store) {
-    console.log("Setting state to", JSON.stringify(store));
+    // console.log("Setting state to", JSON.stringify(store));
     localStorage.setItem("store", JSON.stringify(store));
   }
 
@@ -367,7 +375,7 @@ class Store {
   /* ************** */
   /* essential crud (entries) - create, read, update, delete */
   addEntry(entry) {
-    console.log(`Add entry: ${JSON.stringify(entry)}`);
+    console.log(`Add entry:`, entry);
 
     // TODO: Implement category and whatever completed is
     //
@@ -384,7 +392,7 @@ class Store {
     urlencoded.append("end", entry.end);
     urlencoded.append("start", entry.start);
 
-    request_body.call(this, "/member/" + this.user.id + "/calander/1", urlencoded, function (result) {
+    request_body.call(this, "/member/" + this.user.id + "/calander/" + entry.category, urlencoded, function (result) {
       console.log("New event ID: ", result);
       entry.id = result.id;
 
@@ -418,30 +426,36 @@ class Store {
   }
 
   getActiveEntries() {
-    console.log("Getting active entries");
+    // console.log("Getting active entries");
     const active = this.getActiveCategories();
     if (!active) return [];
+    console.log("Active categories: ", active);
     const activeEntries = this.store.filter((entry) => {
+      for(let i = 0; i < active.length; i++){
+        if(entry.category === this.ctg[active[i]].name)
+          return true;
+      }
+      // console.log(entry.indexOf(entry.category));
       return active ? active.indexOf(entry.category) > -1 : [];
     });
-    console.log(activeEntries);
-    console.log("=======================");
+    // console.log(activeEntries);
+    // console.log("=======================");
     return activeEntries;
   }
 
   getEntry(id) {
     let entry = this.store.find((entry) => entry.id === id);
-    console.log(`Get entry: ${JSON.stringify(entry)}`);
+    // console.log(`Get entry: ${JSON.stringify(entry)}`);
     return entry;
   }
 
   getEntries() {
-    console.log("Get entries");
+    // console.log("Get entries");
     return this.store || [];
   }
 
   getEntriesByCtg(ctg) {
-    console.log("Get entries by ctg:");
+    console.log("Get entries by ctg: " + ctg);
     return this.store.filter((entry) => {
       return entry.category === ctg;
     });
@@ -454,9 +468,11 @@ class Store {
   }
 
   getLastEntryId() {
-    console.log("Get last entry id");
-
-    return this.store[this.store.length - 1].id;
+    // console.log("Get last entry id");
+    let idx = this.store.length - 1 <= 0 ? -1  : this.store.length - 1;
+    if (idx === -1)
+      return -1;
+    return this.store[idx].id;
   }
 
   compareEntries(entry1, entry2) {
@@ -474,7 +490,7 @@ class Store {
   }
 
   updateEntry(id, data) {
-    console.log(`Update entry: ${id} with ${JSON.stringify(data)}`);
+    console.log(`Update entry: ${id} with`, data);
 
     let entry = this.getEntry(id);
     entry = Object.assign(entry, data);
@@ -583,8 +599,8 @@ class Store {
   }
 
   getDayEntries(day) {
-    console.log("Get day entries");
-    console.log("Day:", day);
+    // console.log("Get day entries");
+    // console.log("Day:", day);
 
     let activeEntries = this.getActiveEntries();
     let boxes = {
@@ -607,7 +623,7 @@ class Store {
     });
 
     dayEntries.forEach((entry) => {
-      console.log("Day entries");
+      // console.log("Day entries");
       entry.coordinates = this.generateCoordinates(
         new Date(entry.start),
         new Date(entry.end)
@@ -623,7 +639,7 @@ class Store {
   }
 
   getDayEntriesArray(targetDate) {
-    console.log("Get day entries array");
+    // console.log("Get day entries array");
 
     let activeEntries = this.getActiveEntries();
     if (activeEntries.length === 0) return [];
@@ -644,7 +660,7 @@ class Store {
   }
 
   getMonthEntries(montharr) {
-    console.log("Get month entries");
+    // console.log("Get month entries");
     let activeEntries = this.getActiveEntries();
     if (activeEntries.length === 0) return [];
 
@@ -657,7 +673,7 @@ class Store {
   }
 
   getMonthEntryDates(montharr) {
-    console.log("Get month entry dates");
+    // console.log("Get month entry dates");
     let entries = this.getMonthEntries(montharr);
     let grouped = {};
     entries.forEach((entry) => {
@@ -752,6 +768,8 @@ class Store {
   /* ********************* */
   /*  CATEGORY MANAGEMENT */
   addNewCtg(categoryName, color) {
+    console.log("Add new category - " + categoryName + " " + color);
+
     if (!this.hasCtg(categoryName)) {
       this.ctg[categoryName] = {
         color: color,
@@ -762,6 +780,8 @@ class Store {
   }
 
   deleteCategory(category) {
+    console.log("Delete category - " + category);
+
     if (this.hasCtg(category)) {
       delete this.ctg[category];
       Store.setCtg(this.ctg);
@@ -801,6 +821,7 @@ class Store {
   }
 
   getActiveCategoriesKeyPair() {
+
     return Object.entries(this.ctg).filter((key) => key[1].active);
   }
 
@@ -809,21 +830,45 @@ class Store {
   }
 
   getAllCtgColors() {
+    console.log("Get all ctg colors");
+    console.log(this.ctg);
+    console.log(Object.values(this.ctg));
+    console.log(Object.values(this.ctg).map((ctg) => ctg.color));
+
     return Object.values(this.ctg).map((ctg) => ctg.color);
   }
 
   getAllCtgNames() {
+    return Object.values(this.ctg).map((ctg) => ctg.name);
+  }
+
+  getAllCtgIDs() {
     return Object.keys(this.ctg);
   }
 
-  getCategoryStatus(category) {
-    if (this.ctg.hasOwnProperty(category)) {
-      return this.ctg[category].active;
+  getCategoryStatus(cat_id) {
+    if (this.ctg.hasOwnProperty(cat_id)) {
+      return this.ctg[cat_id].active;
     }
   }
 
-  getCtgColor(ctg) {
-    return this.ctg[ctg].color;
+  getCtgColor(ctg_title) {
+    let ctg_id = this.getCtgID(ctg_title);
+    console.log("Get ctg color - " + ctg_id);
+    if(!this.ctg[ctg_id]) {
+      console.warn("Category not found:", ctg_id, "Returning #000000");
+      return "#000000";
+    }
+    return this.ctg[ctg_id].color;
+  }
+
+  getCtgID(ctg_title) {
+    for (let [key, obj] of Object.entries(this.ctg)) {
+        if (obj.name === ctg_title) {
+            return key;
+        }
+    }
+    return -1;
   }
 
   getCtgLength(category) {
@@ -831,13 +876,14 @@ class Store {
   }
 
   hasCtg(categoryName) {
-    let hasctg = false;
-    for (let key in this.ctg) {
-      if (key.toLowerCase() === categoryName.toLowerCase()) {
-        hasctg = true;
+    console.log("Has category - " + categoryName);
+    console.log(this.ctg);
+    Object.values(this.ctg).forEach((ctg) => {
+      if (ctg.name.toLowerCase() === categoryName.toLowerCase()) {
+        return true;
       }
-    }
-    return hasctg;
+    });
+    return false;
   }
 
   /**
@@ -866,10 +912,14 @@ class Store {
   }
 
   setCategoryStatus(category, status) {
-    if (this.hasCtg(category)) {
+    // if (this.hasCtg(category)) {
+    if(this.ctg[category]) {
       this.ctg[category].active = status;
       Store.setCtg(this.ctg);
+    } else{
+      console.warn("Category not found");
     }
+    // }
   }
 
   setAllCategoryStatusExcept(category, status) {

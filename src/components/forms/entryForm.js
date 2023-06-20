@@ -435,7 +435,7 @@ export default function setEntryForm(context, store, datepickerContext) {
     }
     /* ************************** */
     /*  CATEGORY VALIDATION CHECK */
-    if (!store.hasCtg(category) || !category) {
+    if(store[category] || !category) {
       categoryModalWrapper.setAttribute("data-form-category", "default");
     }
     /* **************************** */

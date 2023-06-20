@@ -11,13 +11,15 @@ export default class FormSetup {
    * @param {string} id (entry ID || null)
    * @param {string} title || null
    * @param {string} description || nulll
+   * @param {string} location || nulll
    */
-  setSubmission(type, id, title, description) {
+  setSubmission(type, id, title, description, location) {
     this.submission = {
       type: type,
       id: id || null,
       title: title || null,
       description: description || null,
+      location: location || null,
     };
   }
 

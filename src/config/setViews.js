@@ -87,6 +87,6 @@ export default function setViews(component, context, store, datepickerContext) {
   }
 
   hideViews();
-  document.title = context.getMonthName();
+  document.title = "GCal - " + context.getMonthName();
   initView(component);
 }

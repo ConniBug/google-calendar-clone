@@ -322,7 +322,7 @@ export default function setDayView(context, store, datepickerContext) {
       ? store.setFormResetHandle("day", closearg)
       : store.setFormResetHandle("day", setResetDv);
     const setup = new FormSetup();
-    setup.setSubmission("edit", id, entry.title, entry.description);
+    setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
     setup.setCategory(entry.category, color);
     setup.setDates(getFormDateObject(start, entry.end));
     fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);
@@ -521,7 +521,7 @@ export default function setDayView(context, store, datepickerContext) {
         );
         store.setFormResetHandle("day", setResetDv);
         const setup = new FormSetup();
-        setup.setSubmission("edit", id, entry.title, entry.description);
+        setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
         setup.setCategory(entry.category, color);
         setup.setDates(getFormDateObject(start, entry.end));
         fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);
@@ -587,8 +587,8 @@ export default function setDayView(context, store, datepickerContext) {
     const openForm = store.getRenderFormCallback();
     const setup = new FormSetup();
 
-    const [submitType, id, title, description] = type;
-    setup.setSubmission(submitType, id, title, description);
+    const [submitType, id, title, description, location] = type;
+    setup.setSubmission(submitType, id, title, description, location);
     if (submitType === "create") {
       box.style.opacity = 0.9;
     }
@@ -697,7 +697,7 @@ export default function setDayView(context, store, datepickerContext) {
         box,
         [tempcategory, color],
         datesData,
-        ["create", null, null, null]
+        ["create", null, null, null, null]
       );
 
       setStylingForEvent("dragend", dvGrid, store);

@@ -51,9 +51,11 @@ class FormConfig {
     );
   }
 
-  configFormTitleDescriptionInput(title, description) {
+  // Setting title and description and location in form edit
+  configFormTitleDescriptionInput(title, description, location) {
+    console.log(this.formTitleDescription);
     this.formTitleDescription.forEach((input, idx) => {
-      input.firstElementChild.value = [title, description][idx];
+      input.firstElementChild.value = [title, description, location][idx];
     });
   }
 
@@ -149,7 +151,8 @@ class FormConfig {
     if (data.submission.type === "edit") {
       this.configFormTitleDescriptionInput(
         data.submission.title,
-        data.submission.description
+        data.submission.description,
+        data.submission.location,
       );
     }
   }

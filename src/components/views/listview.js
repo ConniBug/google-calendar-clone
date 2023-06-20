@@ -188,7 +188,7 @@ export default function setListView(context, store, datepickerContext) {
     store.setFormResetHandle("list", resetCellActive);
 
     const setup = new FormSetup();
-    setup.setSubmission("edit", id, entry.title, entry.description);
+    setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
     setup.setCategory(entry.category, color);
     setup.setDates(getFormDateObject(start, entry.end));
     fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);
