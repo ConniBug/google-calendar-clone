@@ -7,7 +7,7 @@ var body = 'A message.';
 var icon = '/images/icon-192x192.png';
 var tag = 'tag';
 
-function init() {
+async function init() {
     if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
         console.warn('Notifications aren\'t supported.');
         return;
@@ -21,17 +21,13 @@ function init() {
     //     return;
     // }
 
-    self.registration.showNotification(title, {
+    const registration = await navigator.serviceWorker.getRegistration();
+    registration.showNotification(title, {
         body: body,
         icon: icon,
         tag: tag
-    })
+    });
 
 }
 
 init();
-self.registration.showNotification(title, {
-    body: body,
-    icon: icon,
-    tag: tag
-})
