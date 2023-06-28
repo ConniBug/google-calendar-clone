@@ -279,58 +279,70 @@ class Store {
     // TODO: Ensure the user cant create new events when not logged in. nor update them etc.
     this.online_ready = true;
     this.offline_queue = [];
-    request_get.call(this, "/member/" + this.user.id + "/calander/1", function (result) {
-      // console.log("Server events");
-      let json = JSON.parse(result);
-      l.log("Server updated events list - ");
-      console.log(json);
 
-      let build = [];
-      json.forEach(e => {
-        build.push({
-          "id": e.id,
-          "category": e.calanderID,
-          "completed": false,
-          "description": e.description,
-          "location": e.location || "N/A",
-          "start":  e.eventStart,
-          "end":  e.eventEnd,
-          "title": e.title
-        })
-        this.online_ready = true;
-      });
-      this.store = build;
+    setInterval(() => {
+      request_get.call(this, "/member/" + this.user.id + "/calander/1", function (result) {
+        // console.log("Server events");
+        let last = this.store;
+        let json = JSON.parse(result);
+        // l.log("Server updated events list - ");
+        // console.log(json);
 
-      renderViews(context, datepickerContext, this);
+        let build = [];
+        json.forEach(e => {
+          build.push({
+            "id": e.id,
+            "category": e.calanderID,
+            "completed": false,
+            "description": e.description,
+            "location": e.location || "N/A",
+            "start":  e.eventStart,
+            "end":  e.eventEnd,
+            "title": e.title
+          })
+          this.online_ready = true;
+        });
 
-      let overlay = document.getElementById('overlay'); overlay.style.display = 'none';
-          overlay = document.getElementById('overlay_blank');overlay.style.display = 'none';
+        if(JSON.stringify(last) !== JSON.stringify(build)) {
+          console.log("Server updated events list - ", build);
+          this.store = build;
 
-      const login_container = document.getElementById('login_page-container');
-      login_container.style.display = 'none';
-    }, true);
+          renderViews(context, datepickerContext, this);
+        }
 
-    request_get.call(this, "/member/" + this.user.id , function (result) {
-      let json = JSON.parse(result);
-      console.log("Logged in member - ", json);
-      let build = {};
-      build.default = { name: "default", color: colors.blue[4], active: true, id: 0 };
+        let overlay = document.getElementById('overlay'); overlay.style.display = 'none';
+            overlay = document.getElementById('overlay_blank');overlay.style.display = 'none';
 
-      json.calanders.forEach(e => {
-        build[e.id] = {
-          "id": e.id,
-          "name": e.name,
-          "color": e.colour,
-          "editable": e.editable,
-          "active": true,
-        };
-      });
+        const login_container = document.getElementById('login_page-container');
+        login_container.style.display = 'none';
+      }, true);
 
-      this.ctg = build;
-      Store.setCtg(this.ctg);
+      request_get.call(this, "/member/" + this.user.id , function (result) {
+        let last = this.ctg;
+        let json = JSON.parse(result);
+        // console.log("Logged in member - ", json);
+        let build = {};
+        build.default = { name: "default", color: colors.blue[4], active: true, id: 0 };
 
-      renderViews(context, datepickerContext, this);
-    }, true);
+        json.calanders.forEach(e => {
+          build[e.id] = {
+            "id": e.id,
+            "name": e.name,
+            "color": e.colour,
+            "editable": e.editable,
+            "active": true,
+          };
+        });
+
+        if(JSON.stringify(last) !== JSON.stringify(build)) {
+          console.log("Server updated calendar list - ", build);
+          this.ctg = build;
+          Store.setCtg(this.ctg);
+
+          renderViews(context, datepickerContext, this);
+        }
+      }, true);
+    }, 1000 * 1);
   }
 
 
@@ -929,7 +941,7 @@ class Store {
   }
 
   getCtgColorTitle(ctg_title) {
-    console.log("Get ctg color by title - " + ctg_title);
+    // console.log("Get ctg color by title - " + ctg_title);
     let ctg_id = this.getCtgID(ctg_title);
     if(!this.ctg[ctg_id]) {
       console.warn("Category not found:", ctg_id, "Returning #000000");
@@ -938,7 +950,7 @@ class Store {
     return this.ctg[ctg_id].color;
   }
   getCtgColor(ctg_id) {
-    l.verbose("Get ctg color by id - " + ctg_id);
+    // l.verbose("Get ctg color by id - " + ctg_id);
     if(!this.ctg[ctg_id]) {
       console.warn("Category not found:", ctg_id, "Returning #000000");
       return "#ffb6c1";

@@ -16,10 +16,10 @@ function init() {
         console.warn('The user has blocked notifications.');
         return;
     }
-    if (!('PushManager' in window)) {
-        console.warn('Push messaging isn\'t supported.');
-        return;
-    }
+    // if (!('PushManager' in window)) {
+    //     console.warn('Push messaging isn\'t supported.');
+    //     return;
+    // }
 
     self.registration.showNotification(title, {
         body: body,
