@@ -2,10 +2,36 @@ import { precacheAndRoute } from 'workbox-precaching/precacheAndRoute';
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-navigator.serviceWorker.ready.then((registration) => {
-    registration.showNotification("Afternoon", {
-        body: "Test beep beep",
-        vibrate: [200, 100, 200, 100, 200, 100, 200],
-        tag: "vibration-sample",
-    });
-});
+var title = 'Yay a message.';
+var body = 'A message.';
+var icon = '/images/icon-192x192.png';
+var tag = 'tag';
+
+function init() {
+    if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
+        console.warn('Notifications aren\'t supported.');
+        return;
+    }
+    if (Notification.permission === 'denied') {
+        console.warn('The user has blocked notifications.');
+        return;
+    }
+    if (!('PushManager' in window)) {
+        console.warn('Push messaging isn\'t supported.');
+        return;
+    }
+
+    self.registration.showNotification(title, {
+        body: body,
+        icon: icon,
+        tag: tag
+    })
+
+}
+
+init();
+self.registration.showNotification(title, {
+    body: body,
+    icon: icon,
+    tag: tag
+})
