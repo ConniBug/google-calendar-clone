@@ -159,7 +159,7 @@ export default function getEntryOptionModal(context, store, entry, datepickerCon
     entry.description.length === 0 ? entryOptionDescription.parentElement.style.display = "none" : entryOptionDescription.textContent = entry.description;
 
     entryOptionCategoryIcon.setAttribute("fill", store.getCtgColor(entry.category));
-    entryOptionCategory.textContent = entry.category;
+    entryOptionCategory.textContent = store.getCtgName(entry.category);
 
     entryOptionsWrapper.onclick = delegateEntryOptions;
     entryOptionsOverlay.onclick = formNegated;

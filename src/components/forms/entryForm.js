@@ -24,6 +24,8 @@ import {
   isDate,
   getDateFromAttribute,
 } from "../../utilities/dateutils";
+import renderViews from "../../config/renderViews";
+import context, {datepickerContext} from "../../context/appContext";
 
 // main app sidebar
 const sidebar = document.querySelector(".sidebar");
@@ -646,8 +648,6 @@ export default function setEntryForm(context, store, datepickerContext) {
   }
 
   function handleFormSubmission(e) {
-    console.log("Start handling form submission");
-
     e.preventDefault();
     const title = titleInput.value;
     const description = descriptionInput.value;
@@ -668,29 +668,44 @@ export default function setEntryForm(context, store, datepickerContext) {
 
     // submission : edit
     if (formSubmitButton.getAttribute("data-form-action") === "edit") {
+      console.log("Handling edit submission");
+
+      if(!store.online_ready) {
+        console.log("Client is in offline mode");
+        console.log("Adding to offline queue", {
+          func: this.handleFormSubmission,
+          args: [e]
+        });
+        this.offline_queue.push({
+          func: this.handleFormSubmission,
+          args: [e]
+        });
+        return;
+      }
+
       const id = formSubmitButton.getAttribute("data-form-entry-id");
       const entryBefore = JSON.parse(JSON.stringify(store.getEntry(id)));
+      const entryAfter = {
+        category: category,
+        completed: false,
+        description: description,
+        location: location,
+        end: endDate,
+        id: id,
+        start: startDate,
+        title: title,
+      };
 
-      store.updateEntry(
-        id,
-        {
-          category: category,
-          completed: false,
-          description: description,
-          location: location,
-          end: endDate,
-          id: id,
-          start: startDate,
-          title: title,
-        }
-      );
+      store.updateEntry(id, entryAfter);
 
       handleSubmissionRender(
-        startDate, 'edit', id, entryBefore
+          startDate, 'edit', id, entryBefore
       );
+
       return;
     }
 
+    console.log("Handling create submission")
     // submission : create
     store.createEntry(
       category, false, description, endDate, startDate, title, location
@@ -703,6 +718,8 @@ export default function setEntryForm(context, store, datepickerContext) {
   }
 
   function handleCategorySelection(e) {
+    console.log("Start handling category selection");
+
     const title = e.target.getAttribute("data-form-category-title");
     const color = e.target.getAttribute("data-form-category-color");
     categoryModalWrapper.setAttribute("data-form-category", title);
@@ -710,7 +727,7 @@ export default function setEntryForm(context, store, datepickerContext) {
 
     selectedCategoryWrapper.style.backgroundColor = color;
     selectedCategoryColor.style.backgroundColor = color;
-    selectedCategoryTitle.textContent = title;
+    selectedCategoryTitle.textContent = store.getCtgName(title) || "N/A";
     closeCategoryModal();
   }
 
@@ -725,6 +742,8 @@ export default function setEntryForm(context, store, datepickerContext) {
   }
 
   function createCategoryOptions(parent, categories) {
+    console.log("Start creating category options");
+
     const currentCategory = categoryModalWrapper.getAttribute("data-form-category");
 
     categories.forEach(([key, value]) => {
@@ -743,7 +762,7 @@ export default function setEntryForm(context, store, datepickerContext) {
 
       const categoryTitle = document.createElement("div");
       categoryTitle.classList.add("category-modal--category-title");
-      categoryTitle.textContent = key;
+      categoryTitle.textContent = store.getCtgName(key);
 
       if (key === currentCategory) {
         const checkIcon = createCheckIcon("var(--white4)");
@@ -1099,7 +1118,7 @@ export default function setEntryForm(context, store, datepickerContext) {
     categoryModalWrapper.setAttribute("data-form-category", categoryTitle);
 
     selectedCategoryWrapper.style.backgroundColor = categoryColor;
-    selectedCategoryTitle.textContent = categoryTitle;
+    selectedCategoryTitle.textContent = store.getCtgName(categoryTitle) || "N/A";
     selectedCategoryColor.style.backgroundColor = categoryColor;
     categoryModalIcon.firstElementChild.setAttribute("fill", categoryColor);
   }

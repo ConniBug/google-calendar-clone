@@ -125,12 +125,12 @@ class FormConfig {
   }
 
   configFormCategoryInput(categoryData) {
-    const [title, color] = categoryData;
+    const [title, color, real_name] = categoryData;
     this.formCategoryWrapper.setAttribute("data-form-category", title);
     this.formCategorySelect.style.backgroundColor = color;
     this.formCategoryWrapperIcon.style.backgroundColor = color;
     this.formCatgoryIcon.firstChild.setAttribute("fill", color);
-    this.formCategoryTitle.textContent = title;
+    this.formCategoryTitle.textContent = real_name;
   }
 
   getConfig(data) {
@@ -142,6 +142,7 @@ class FormConfig {
     this.configFormCategoryInput([
       data.category.name,
       data.category.color,
+      data.category.real_name,
     ]);
 
     this.configFormDateInputs(

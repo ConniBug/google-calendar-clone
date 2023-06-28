@@ -1,7 +1,8 @@
 import Entry from "../factory/entries";
 import localStoreKeyNames from "./constants";
-import { testDate, compareDates } from "../utilities/dateutils";
+import {compareDates, testDate} from "../utilities/dateutils";
 import locales from "../locales/en";
+import l from "../utilities/logging";
 import defautlKeyboardShortcuts from "../locales/kbDefault";
 import renderViews from "../config/renderViews";
 import context, {datepickerContext} from "./appContext";
@@ -210,11 +211,13 @@ class Store {
 
     this.userUpload;
 
-    this.ctg = localStorage.getItem("ctg")
-        ? JSON.parse(localStorage.getItem("ctg"))
-        : {
-          default: {name: "default", color: colors.blue[4], active: true},
-        };
+    if(localStorage.getItem("ctg")) {
+      this.ctg = JSON.parse(localStorage.getItem("ctg"));
+    }
+    else {
+      this.ctg = {};
+      this.ctg.default = {name: "default", color: colors.blue[4], active: true, id: 0};
+    }
 
     this.activeOverlay = new Set();
 
@@ -274,16 +277,19 @@ class Store {
     }
 
     // TODO: Ensure the user cant create new events when not logged in. nor update them etc.
-    this.store.online_ready = false;
+    this.online_ready = true;
+    this.offline_queue = [];
     request_get.call(this, "/member/" + this.user.id + "/calander/1", function (result) {
       // console.log("Server events");
       let json = JSON.parse(result);
-      console.log("Server updated events list - ", json);
+      l.log("Server updated events list - ");
+      console.log(json);
+
       let build = [];
       json.forEach(e => {
         build.push({
           "id": e.id,
-          "category": "default",
+          "category": e.calanderID,
           "completed": false,
           "description": e.description,
           "location": e.location || "N/A",
@@ -291,13 +297,11 @@ class Store {
           "end":  e.eventEnd,
           "title": e.title
         })
-        this.store.online_ready = true;
+        this.online_ready = true;
       });
       this.store = build;
-      // console.log("Build is equal to ", build);
+
       renderViews(context, datepickerContext, this);
-
-
 
       let overlay = document.getElementById('overlay'); overlay.style.display = 'none';
           overlay = document.getElementById('overlay_blank');overlay.style.display = 'none';
@@ -306,6 +310,27 @@ class Store {
       login_container.style.display = 'none';
     }, true);
 
+    request_get.call(this, "/member/" + this.user.id , function (result) {
+      let json = JSON.parse(result);
+      console.log("Logged in member - ", json);
+      let build = {};
+      build.default = { name: "default", color: colors.blue[4], active: true, id: 0 };
+
+      json.calanders.forEach(e => {
+        build[e.id] = {
+          "id": e.id,
+          "name": e.name,
+          "color": e.colour,
+          "editable": e.editable,
+          "active": true,
+        };
+      });
+
+      this.ctg = build;
+      Store.setCtg(this.ctg);
+
+      renderViews(context, datepickerContext, this);
+    }, true);
   }
 
 
@@ -393,8 +418,8 @@ class Store {
     urlencoded.append("start", entry.start);
 
     request_body.call(this, "/member/" + this.user.id + "/calander/" + entry.category, urlencoded, function (result) {
-      console.log("New event ID: ", result);
-      entry.id = result.id;
+      entry.id = JSON.parse(result).response.id;
+      console.log("New event ID: ", entry.id);
 
       this.store.push(entry);
       Store.setStore(this.store);
@@ -429,7 +454,6 @@ class Store {
     // console.log("Getting active entries");
     const active = this.getActiveCategories();
     if (!active) return [];
-    console.log("Active categories: ", active);
     const activeEntries = this.store.filter((entry) => {
       for(let i = 0; i < active.length; i++){
         if(entry.category === this.ctg[active[i]].name)
@@ -445,7 +469,7 @@ class Store {
 
   getEntry(id) {
     let entry = this.store.find((entry) => entry.id === id);
-    // console.log(`Get entry: ${JSON.stringify(entry)}`);
+    console.log(`Get entry: ${id}`, entry);
     return entry;
   }
 
@@ -490,11 +514,29 @@ class Store {
   }
 
   updateEntry(id, data) {
-    console.log(`Update entry: ${id} with`, data);
+    l.log(`Update entry: ${id} with`, data);
 
-    let entry = this.getEntry(id);
-    entry = Object.assign(entry, data);
-    Store.setStore(this.store);
+    const entryBefore = JSON.parse(JSON.stringify(this.getEntry(id)));
+
+    let urlencoded = new URLSearchParams();
+    for ( let j in entryBefore ) {
+      if(j === "coordinates")
+        continue;
+      if ( entryBefore[j] !== data[j] ) {
+        if(data[j] === undefined)
+          continue;
+        urlencoded.append(j, data[j]);
+      }
+    }
+
+    request_body.call(this, "/" + this.user.id + "/1/" + id, urlencoded, function (result) {
+      let entry = this.getEntry(id);
+      entry = Object.assign(entry, data);
+
+      Store.setStore(this.store);
+      renderViews(context, datepickerContext, this);
+    }, 'PUT');
+
   }
   /* ************ */
 
@@ -768,24 +810,58 @@ class Store {
   /* ********************* */
   /*  CATEGORY MANAGEMENT */
   addNewCtg(categoryName, color) {
-    console.log("Add new category - " + categoryName + " " + color);
+    console.log("Add new category - " + categoryName + " " + color + " " + name);
 
-    if (!this.hasCtg(categoryName)) {
-      this.ctg[categoryName] = {
+    if(!this.online_ready) {
+      console.log("Client is in offline mode");
+      console.log("Adding to offline queue", {
+        func: this.addNewCtg,
+        args: [categoryName, color]
+      });
+      this.offline_queue.push({
+        func: this.addNewCtg,
+        args: [categoryName, color]
+      });
+      return;
+    }
+
+    let urlencoded = new URLSearchParams();
+    urlencoded.append("name", categoryName);
+    urlencoded.append("colour", color);
+    request_body.call(this, "/member/" + this.user.id + "/calander", urlencoded, function(response) {
+      let calID = JSON.parse(response).response.id;
+
+      console.log("CalID: " + calID);
+
+      this.ctg[calID] = {
         color: color,
         active: true,
+        name: categoryName,
+        id: calID,
       };
       Store.setCtg(this.ctg);
-    }
+      renderViews(context, datepickerContext, this);
+
+    }, 'POST', true);
   }
 
   deleteCategory(category) {
+    category = this.getCtgID(category);
     console.log("Delete category - " + category);
 
-    if (this.hasCtg(category)) {
+    let urlencoded = new URLSearchParams();
+    urlencoded.append("CalanderID", category);
+    request_body.call(this, "/member/" + this.user.id + "/calander", urlencoded, function(response) {
+      let status = JSON.parse(response).response.status;
+
+      console.log("Deleted category: " + category + " - status: " + status);
+
       delete this.ctg[category];
       Store.setCtg(this.ctg);
-    }
+
+      renderViews(context, datepickerContext, this);
+
+    }, 'DELETE', true);
   }
 
   getDefaultCtg() {
@@ -852,14 +928,29 @@ class Store {
     }
   }
 
-  getCtgColor(ctg_title) {
+  getCtgColorTitle(ctg_title) {
+    console.log("Get ctg color by title - " + ctg_title);
     let ctg_id = this.getCtgID(ctg_title);
-    console.log("Get ctg color - " + ctg_id);
     if(!this.ctg[ctg_id]) {
       console.warn("Category not found:", ctg_id, "Returning #000000");
-      return "#000000";
+      return "#ffb6c1";
     }
     return this.ctg[ctg_id].color;
+  }
+  getCtgColor(ctg_id) {
+    l.verbose("Get ctg color by id - " + ctg_id);
+    if(!this.ctg[ctg_id]) {
+      console.warn("Category not found:", ctg_id, "Returning #000000");
+      return "#ffb6c1";
+    }
+    return this.ctg[ctg_id].color;
+  }
+  getCtgName(ctg_id) {
+    if(!this.ctg[ctg_id]) {
+      console.warn("Category not found:", ctg_id, "Returning #000000");
+      return "#ffb6c1";
+    }
+    return this.ctg[ctg_id].name;
   }
 
   getCtgID(ctg_title) {
@@ -990,7 +1081,6 @@ class Store {
     }
     if (entries.length !== length) {
       console.error("something went wrong with category name/color change");
-      return;
     } else {
       this.ctg = Object.fromEntries(entries);
       this.moveCategoryEntriesToNewCategory(oldName, newName, true);

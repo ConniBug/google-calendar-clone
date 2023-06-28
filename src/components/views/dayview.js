@@ -323,7 +323,7 @@ export default function setDayView(context, store, datepickerContext) {
       : store.setFormResetHandle("day", setResetDv);
     const setup = new FormSetup();
     setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
-    setup.setCategory(entry.category, color);
+    setup.setCategory(entry.category, color, store.getCtgName(entry.category));
     setup.setDates(getFormDateObject(start, entry.end));
     fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);
 
@@ -522,7 +522,7 @@ export default function setDayView(context, store, datepickerContext) {
         store.setFormResetHandle("day", setResetDv);
         const setup = new FormSetup();
         setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
-        setup.setCategory(entry.category, color);
+        setup.setCategory(entry.category, color, store.getCtgName(entry.category));
         setup.setDates(getFormDateObject(start, entry.end));
         fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);
 
@@ -594,7 +594,7 @@ export default function setDayView(context, store, datepickerContext) {
     }
 
     const [categoryName, color] = category;
-    setup.setCategory(categoryName, color);
+    setup.setCategory(categoryName, color, store.getCtgName(categoryName));
 
     const [start, end] = dates;
     setup.setDates(getFormDateObject(start, end));

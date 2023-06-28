@@ -65,7 +65,7 @@ export default function handleSidebarCategories(context, store, datepickerContex
     checkbox.setAttribute("data-sbch-checked", `${status}`);
     checkbox.setAttribute("data-sbch-category", ctgname);
 
-    console.log("Create category list item: ", ctgname, ctgcolor, status);
+    // console.log("Create category list item: ", ctgname, ctgcolor, status);
     
     let checkIcon;
     if (status) {

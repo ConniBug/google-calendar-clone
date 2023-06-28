@@ -366,6 +366,7 @@ export default function setWeekView(context, store, datepickerContext) {
     setup.setCategory(
       categoryName,
       color,
+      store.getCtgName(categoryName)
     );
 
     const [start, end] = dates;
@@ -393,7 +394,7 @@ export default function setWeekView(context, store, datepickerContext) {
     store.setFormResetHandle("week", handleCloseCallback);
     const setup = new FormSetup();
     setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
-    setup.setCategory(entry.category, color);
+    setup.setCategory(entry.category, color, store.getCtgName(entry.category));
     setup.setDates(getFormDateObject(start, entry.end));
     fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);
 
@@ -526,7 +527,7 @@ export default function setWeekView(context, store, datepickerContext) {
 
         const setup = new FormSetup();
         setup.setSubmission("edit", id, entry.title, entry.description, entry.location);
-        setup.setCategory(entry.category, color);
+        setup.setCategory(entry.category, color, store.getCtgName(entry.category));
         setup.setDates(getFormDateObject(start, entry.end));
         fullFormConfig.setFormDatepickerDate(context, datepickerContext, start);
 

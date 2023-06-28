@@ -24,15 +24,16 @@ export default class FormSetup {
   }
 
   /**
-   * 
+   *
    * @param {string} name (store category name)
    * @param {string} color (store category color)
    * @param {string} offsetColor (category color rgba 0.5)
    */
-  setCategory(name, color) {
+  setCategory(name, color, real_name) {
     this.category = {
       name: name,
       color: color,
+      real_name: real_name,
     };
   }
 

@@ -68,3 +68,9 @@ if ('serviceWorker' in navigator) {
 /*!*************************************!*/
 setAppDefaults(context, store);
 renderViews(context, datepickerContext, store);
+
+if (window.Notification) {
+    Notification.requestPermission((status) => {
+        console.log('Status of the request:', status);
+    });
+}

@@ -125,7 +125,7 @@ export default function createCategoryForm(store, selectedCategory, editing, res
           }
         }
       } else {
-        store.addNewCtg(trimName, color);
+        store.addNewCtg(trimName, color, name);
       }
 
       const fullrenderCtg = store.getRenderCategoriesCallback();
