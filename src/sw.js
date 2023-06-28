@@ -21,12 +21,12 @@ async function init() {
     //     return;
     // }
 
-    const registration = await navigator.serviceWorker.getRegistration();
-    registration.showNotification(title, {
-        body: body,
-        icon: icon,
-        tag: tag
-    });
+    // const registration = await navigator.serviceWorker.getRegistration();
+    // registration.showNotification(title, {
+    //     body: body,
+    //     icon: icon,
+    //     tag: tag
+    // });
 
 }
 

@@ -80,6 +80,7 @@ module.exports = {
     // }),
     new WebpackPwaManifest(
         {
+          id: "https://cal.transgirl.space/",
 
           "dir": "ltr",
           "lang": "en",
@@ -106,13 +107,24 @@ module.exports = {
 
           icons: [
             {
-              src: path.resolve('src/assets/logo.svg'),
-              sizes: [96, 128, 192, 256, 384, 512],
-              type: "image/svg",
+              src: path.resolve('src/assets/logo-512x.png'),
+              sizes: [512],
+              type: "image/png",
             },
             {
               src: path.resolve('src/assets/logo.svg'),
-              sizes: [96, 128, 192, 256, 384, 512],
+              sizes: [96, 128, 192, 256, 384],
+              type: "image/svg",
+            },
+            {
+              src: path.resolve('src/assets/logo-512x.png'),
+              sizes: [512],
+              type: "image/png",
+              purpose: 'maskable',
+            },
+            {
+              src: path.resolve('src/assets/logo.svg'),
+              sizes: [96, 128, 192, 256, 384],
               type: "image/svg",
               purpose: 'maskable',
             }
