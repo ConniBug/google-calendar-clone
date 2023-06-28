@@ -26,10 +26,6 @@ function getDateTime() {
     return (year + ":" + month + ":" + day + " - " + hour + ":" + min + ":" + sec);
 }
 
-var callerId = require('caller-id');
-
-var strip = require('strip-color');
-
 logLevel = "LEGITALL";
 function getLogLevelNum(level) {
     if (level == "TESTING") return 0;
@@ -103,22 +99,22 @@ module.exports = {
         return getLogLevelNum(level);
     },
     log: async (message, type = "GENERIC", callingFunction = "N/A") => {
-        log(message, callerId.getData(), type, callingFunction);
+        log(message, "", type, callingFunction);
     },
     verbose: async (message, callingFunction = "N/A") => {
-        log(message, callerId.getData(), "VERBOSE", callingFunction);
+        log(message, "", "VERBOSE", callingFunction);
     },
     error: async (message, callingFunction = "N/A") => {
-        log(message, callerId.getData(), "ERROR", callingFunction);
+        log(message, "", "ERROR", callingFunction);
     },
     warning: async (message, callingFunction = "N/A") => {
-        log(message, callerId.getData(), "WARNING", callingFunction);
+        log(message, "", "WARNING", callingFunction);
     },
     debug: async (message, callingFunction = "N/A") => {
-        log(message, callerId.getData(), "DEBUG", callingFunction);
+        log(message, "", "DEBUG", callingFunction);
     },
     critical: async (message, callingFunction = "N/A") => {
-        log(message, callerId.getData(), "CRITICAL", callingFunction);
+        log(message, "", "CRITICAL", callingFunction);
     },
     char_count: (str, letter) => {
         return char_count(str, letter);
