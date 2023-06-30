@@ -78,7 +78,7 @@
           urlencoded.append("email", email);
           urlencoded.append("password", password);
 
-          request_body.call(this, "/member/login", urlencoded, function (result) {
+          request_body.call(this, "/login", urlencoded, function (result) {
             console.log("Server events");
             let data = JSON.parse(result)["response"];
             console.log(data);
@@ -90,7 +90,7 @@
             const login_container = document.getElementById('login_page-container');
             login_container.style.display = 'none';
 
-          }, true);
+          }, 'POST');
         }
       </script>
       <button onclick="login()">Submit</button>
