@@ -262,7 +262,7 @@ class Store {
     this.keyboardShortcutsStatus = true;
     this.animationStatus = true;
 
-    this.api_url = localStorage.getItem("api_url");
+    this.api_url = localStorage.getItem("api_url") || "https://api-cal.transgirl.space/api";
 
     if(!localStorage.getItem("user")) {
       let str = JSON.stringify({ id: "123", token: "321", expiry: 0 });
@@ -280,69 +280,163 @@ class Store {
     this.online_ready = true;
     this.offline_queue = [];
 
-    setInterval(() => {
-      request_get.call(this, "/member/" + this.user.id + "/calander/1", function (result) {
-        // console.log("Server events");
-        let last = this.store;
-        let json = JSON.parse(result);
-        // l.log("Server updated events list - ");
-        // console.log(json);
 
-        let build = [];
-        json.forEach(e => {
-          build.push({
-            "id": e.id,
-            "category": e.calanderID,
-            "completed": false,
-            "description": e.description,
-            "location": e.location || "N/A",
-            "start":  e.eventStart,
-            "end":  e.eventEnd,
-            "title": e.title
-          })
-          this.online_ready = true;
-        });
+    function websocket_connect() {
+      if (!("WebSocket" in window)) {
+        l.error("Device does not support websockets.", "Websocket");
+        return;
+      }
 
-        if(JSON.stringify(last) !== JSON.stringify(build)) {
-          console.log("Server updated events list - ", build);
-          this.store = build;
+      let ws = new WebSocket("ws://100.110.174.208:8080/", 'echo-protocol');
+      ws.root = this;
 
-          renderViews(context, datepickerContext, this);
+      ws.onopen = function () {
+        l.debug("Websocket connection established.", "Websocket");
+
+        this.user = JSON.parse(localStorage.getItem("user"));
+        this.options = {
+          timeout: 30000,
         }
 
-        let overlay = document.getElementById('overlay'); overlay.style.display = 'none';
-            overlay = document.getElementById('overlay_blank');overlay.style.display = 'none';
+        let msg = {
+          type: "auth",
+          id: this.user.id,
+          token: this.user.token,
+        }
+        ws.send(JSON.stringify(msg));
+        l.debug("Authentication request sent.", "Websocket")
+      };
 
-        const login_container = document.getElementById('login_page-container');
-        login_container.style.display = 'none';
-      }, true);
+      ws.onmessage = function (evt) {
+        let msg = JSON.parse(evt.data);
+        switch (msg.type) {
+          case "auth":
+            if (msg.status !== "success") {
+              l.warning("Authentication failed, token expired?", "Websocket");
+              this.online_ready = false;
+            }
+            l.debug("Authentication successful", "Websocket");
+            break;
+          case "options":
+            this.options = msg.options;
+            l.log("Options received");
+            break;
+          case "heartbeat":
+            l.verbose("Heartbeat received", "Websocket");
+            clearTimeout(this.pingTimeout);
 
-      request_get.call(this, "/member/" + this.user.id , function (result) {
-        let last = this.ctg;
-        let json = JSON.parse(result);
-        // console.log("Logged in member - ", json);
-        let build = {};
-        build.default = { name: "default", color: colors.blue[4], active: true, id: 0 };
+            this.pingTimeout = setTimeout(() => {
+              l.warning("Terminating connection due to no ping response", "Websocket");
+              this.close();
+            }, this.options.timeout + 500);
+            break;
+          case "new_event":
+            l.debug("New event created on another device or by the server", "Websocket");
+            let event = msg.data;
+            if(this.root.store.find(e => e.id === event.id)) {
+                l.verbose("Event already exists, ignoring", "Websocket");
+                return
+            }
+            this.root.store.push(event);
+            Store.setStore(this.root.store);
+            location.reload();
+            return
+          default:
+            l.debug("Message is received: ", "Websocket");
+            console.log(msg);
+        }
+      };
 
-        json.calanders.forEach(e => {
-          build[e.id] = {
-            "id": e.id,
-            "name": e.name,
-            "color": e.colour,
-            "editable": e.editable,
-            "active": true,
-          };
-        });
+      ws.onerror = function (err) {
+        l.error("Error: " + JSON.parse(err), "Websocket");
+      };
 
-        if(JSON.stringify(last) !== JSON.stringify(build)) {
+      ws.onclose = function () {
+        l.log("Connection is closed...", "Websocket");
+        clearTimeout(this.pingTimeout);
+
+        l.log("Attempting to reconnect in 5 seconds", "Websocket");
+        setTimeout(() => {
+          l.log("Attempting to reconnect", "Websocket");
+          websocket_connect.call(this.root);
+        }, 5000);
+      };
+    }
+    websocket_connect.call(this);
+
+    request_get.call(this, "/" + this.user.id + "/events/1", function (result) {
+      // console.log("Server events");
+      let last = this.store;
+      // Strip active vars
+      let json = JSON.parse(result);
+      // l.log("Server updated events list - ");
+      // console.log(json);
+
+      let build = [];
+      json.forEach(e => {
+        build.push({
+          "id": e.id,
+          "category": e.calanderID,
+          "completed": false,
+          "description": e.description,
+          "location": e.location || "N/A",
+          "start":  e.eventStart,
+          "end":  e.eventEnd,
+          "title": e.title
+        })
+        this.online_ready = true;
+      });
+
+      if(JSON.stringify(last) !== JSON.stringify(build)) {
+        console.log("Server updated events list - ", build);
+        this.store = build;
+
+        renderViews(context, datepickerContext, this);
+      }
+
+      let overlay = document.getElementById('overlay'); overlay.style.display = 'none';
+          overlay = document.getElementById('overlay_blank');overlay.style.display = 'none';
+
+      const login_container = document.getElementById('login_page-container');
+      login_container.style.display = 'none';
+    }, true);
+
+    request_get.call(this, "/" + this.user.id + "", function (result) {
+      let last = this.ctg;
+      let json = JSON.parse(result);
+      // console.log("Logged in member - ", json);
+      let build = {};
+      build.default = { name: "default", color: colors.blue[4], active: true, id: 0 };
+
+      json.calanders.forEach(e => {
+        build[e.id] = {
+          "id": e.id,
+          "name": e.name,
+          "color": e.colour,
+          "editable": e.editable,
+          "active": true,
+        };
+      });
+
+      let tmp_old = JSON.stringify(last);
+      let tmp_new = JSON.stringify(build);
+
+      // TODO: There is def a better way to do this.
+      // Regex remove the key 'active' : true/false
+      tmp_old = tmp_old.replace(/"active":(true|false)/g, "");
+      tmp_new = tmp_new.replace(/"active":(true|false)/g, "");
+
+      // Check for differences in events
+      if(tmp_old !== tmp_new) {
           console.log("Server updated calendar list - ", build);
+          console.log(last);
           this.ctg = build;
           Store.setCtg(this.ctg);
 
           renderViews(context, datepickerContext, this);
-        }
-      }, true);
-    }, 1000 * 1);
+      }
+
+    }, true);
   }
 
 
@@ -429,7 +523,7 @@ class Store {
     urlencoded.append("end", entry.end);
     urlencoded.append("start", entry.start);
 
-    request_body.call(this, "/member/" + this.user.id + "/calander/" + entry.category, urlencoded, function (result) {
+    request_body.call(this, "/" + this.user.id + "/events/" + entry.category, urlencoded, function (result) {
       entry.id = JSON.parse(result).response.id;
       console.log("New event ID: ", entry.id);
 
@@ -449,11 +543,8 @@ class Store {
   deleteEntry(delete_id) {
     console.log(`Delete entry: ${delete_id}`);
 
-    var urlencoded = new URLSearchParams();
-    urlencoded.append("EventID", delete_id);
-
-
-    request_body.call(this,"/member/" + this.user.id + "/calander/1", urlencoded, function (result) {
+    let urlencoded = new URLSearchParams();
+    request_body.call(this,"/" + this.user.id + "/events/calander_id/" + delete_id, urlencoded, function (result) {
       console.log("Delete status: ", result);
 
       this.store = this.store.filter((entry) => entry.id !== delete_id);
@@ -541,7 +632,7 @@ class Store {
       }
     }
 
-    request_body.call(this, "/" + this.user.id + "/1/" + id, urlencoded, function (result) {
+    request_body.call(this, "/" + this.user.id + "/events/1/" + id, urlencoded, function (result) {
       let entry = this.getEntry(id);
       entry = Object.assign(entry, data);
 
@@ -840,7 +931,7 @@ class Store {
     let urlencoded = new URLSearchParams();
     urlencoded.append("name", categoryName);
     urlencoded.append("colour", color);
-    request_body.call(this, "/member/" + this.user.id + "/calander", urlencoded, function(response) {
+    request_body.call(this, "/" + this.user.id + "/events/calander", urlencoded, function(response) {
       let calID = JSON.parse(response).response.id;
 
       console.log("CalID: " + calID);
@@ -863,7 +954,7 @@ class Store {
 
     let urlencoded = new URLSearchParams();
     urlencoded.append("CalanderID", category);
-    request_body.call(this, "/member/" + this.user.id + "/calander", urlencoded, function(response) {
+    request_body.call(this, "/" + this.user.id + "/calander", urlencoded, function(response) {
       let status = JSON.parse(response).response.status;
 
       console.log("Deleted category: " + category + " - status: " + status);

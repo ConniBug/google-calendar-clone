@@ -199,7 +199,6 @@ export default function setMonthView(context, store, datepickerContext) {
 
   function populateCells() {
     // console.log("Populate month cells");
-
     monthWrapper.innerText = "";
     let months = context.getMonthArray();
     let monthEntries = store.getMonthEntries(months);
