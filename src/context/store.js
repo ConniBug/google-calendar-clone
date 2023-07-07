@@ -352,7 +352,7 @@ class Store {
       };
 
       ws.onerror = function (err) {
-        l.error("Error: " + JSON.parse(err), "Websocket");
+        l.error("Error: " + JSON.parse(JSON.stringify(err)), "Websocket");
       };
 
       ws.onclose = function () {
