@@ -263,7 +263,7 @@ class Store {
     this.animationStatus = true;
 
     this.api_url = localStorage.getItem("api_url") || "https://api-cal.transgirl.space/api";
-    this.ws_url = localStorage.getItem("ws_url") || "wss://api-cal.transgirl.space:8080";
+    this.ws_url = localStorage.getItem("ws_url") || "api-cal.transgirl.space:8080";
     if(!localStorage.getItem("user")) {
       let str = JSON.stringify({ id: "123", token: "321", expiry: 0 });
       localStorage.setItem("user", str);
@@ -352,7 +352,7 @@ class Store {
       };
 
       ws.onerror = function (err) {
-        l.error("Error: " + JSON.parse(err), "Websocket");
+        l.error("Error: " + JSON.parse(JSON.stringify(err)), "Websocket");
       };
 
       ws.onclose = function () {
