@@ -287,7 +287,7 @@ class Store {
         return;
       }
 
-      let ws = new WebSocket("ws://" + this.ws_url +  "/", 'echo-protocol');
+      let ws = new WebSocket(this.ws_url, 'echo-protocol');
       ws.root = this;
 
       ws.onopen = function () {
