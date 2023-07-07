@@ -129,6 +129,72 @@ export default function getSidebarSubMenu(store, context) {
     const themeIdx = themeRadioOptions.indexOf(context.getColorScheme());
     themeRadioBtns[themeIdx].checked = true;
 
+    const icalSubscriptionsList = document.querySelector(".ical-subscriptions-list");
+    store.getSubs(function(subs) {
+      icalSubscriptionsList.innerHTML = "";
+      if (subs.length <= 0) {
+        return;
+      }
+      subs.forEach((sub) => {
+        const subItem  = document.createElement("div");
+        subItem.classList.add("ical-subscription-item");
+
+        const subName = document.createElement("div");
+        subName.classList.add("j");
+        subName.textContent = sub.name;
+
+        const subUrl = document.createElement("div");
+        subUrl.classList.add("j");
+        subUrl.textContent = sub.url;
+
+        const subDelete = document.createElement("div");
+        subDelete.classList.add("ical-subscription-delete");
+        subDelete.textContent = "Delete";
+        subDelete.onclick = () => {
+          store.deleteSub(sub.id);
+          openSubMenu();
+        }
+
+        /**
+         *               <div class="sm-delete-btn">
+         *                 <div class="sm-delete-icon">
+         *                   <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="var(--white3)">
+         *                     <path
+         *                       d="M6 20q-.825 0-1.412-.587Q4 18.825 4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413Q18.825 20 18 20Zm6-4-5-5 1.4-1.45 2.6 2.6V4h2v8.15l2.6-2.6L17 11Z" />
+         *                   </svg>
+         *                 </div>
+         *                 <div class="sm-delete-title">
+         *                   download.json
+         *                 </div>
+         *               </div>
+         */
+        // Create above in JS
+        const buttonItem = document.createElement("div");
+        buttonItem.classList.add("sm-delete-btn");
+
+        const buttonIcon = document.createElement("div");
+        buttonIcon.classList.add("sm-delete-icon");
+        const buttonIconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        buttonIconSvg.setAttribute("height", "24");
+        buttonIconSvg.setAttribute("width", "24");
+        buttonIconSvg.setAttribute("fill", "var(--white3)");
+        const buttonIconPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        buttonIconPath.setAttribute("d", "M6 20q-.825 0-1.412-.587Q4 18.825 4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413Q18.825 20 18 20Zm6-4-5-5 1.4-1.45 2.6 2.6V4h2v8.15l2.6-2.6L17 11Z");
+        buttonIconSvg.append(buttonIconPath);
+        buttonIcon.append(buttonIconSvg);
+
+        const buttonTitle = document.createElement("div");
+        buttonTitle.classList.add("sm-delete-title");
+        buttonTitle.textContent = sub.name;
+
+        buttonItem.append(buttonIcon, buttonTitle);
+
+
+        subItem.append(subName, subUrl, subDelete, buttonItem);
+        icalSubscriptionsList.append(subItem);
+      });
+    });
+
     const shortcutStatus = store.getShortcutsStatus();
     setStatusIcon(shortcutStatus);
     shortcutSwitch.checked = shortcutStatus;

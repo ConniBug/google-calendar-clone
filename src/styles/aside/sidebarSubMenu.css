@@ -219,6 +219,30 @@
   width: 100%
 }
 
+
+
+.sm-delete-btn {
+  border: 1px solid var(--mediumgrey1);
+  border-radius: 18px;
+  cursor: pointer;
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+  max-width: 180px;
+  padding: 0 8px;
+  width: 100%
+}
+
+.sm-delete-btn:last-child {
+  margin-left: 8px
+}
+
+.sm-delete-btn:hover {
+  background: var(--black0)
+}
+
+
+
 .sm-json-btn {
   border: 1px solid var(--mediumgrey1);
   border-radius: 18px;
@@ -239,12 +263,14 @@
   background: var(--black0)
 }
 
+.sm-delete-icon,
 .sm-download-json-icon,
 .sm-upload-json-icon {
   height: 100%;
   width: 24px
 }
 
+.sm-delete-icon,
 .sm-download-json-icon,
 .sm-download-json-title,
 .sm-upload-json-icon,
@@ -666,11 +692,14 @@
     font-size: 12px;
   }
 
+  .sm-delete-icon,
   .sm-download-json-icon,
   .sm-upload-json-icon {
     width: 20px
   }
 
+
+  .sm-delete-icon svg,
   .sm-download-json-icon svg,
   .sm-upload-json-icon svg {
     transform: scale(.8)

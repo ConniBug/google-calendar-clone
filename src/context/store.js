@@ -149,7 +149,7 @@ function request_get(path, callback_result, authed = true, callback_error = null
       requestOptions.headers = {authorization: `Bearer ${this.user.token}`};
 
     try {
-      fetch(this.api_url + path, requestOptions)
+      return fetch(this.api_url + path, requestOptions)
           .then(response => response.text())
           .then(result => {
             if(authed) {
@@ -161,8 +161,10 @@ function request_get(path, callback_result, authed = true, callback_error = null
                 return "Un-Authorised!"
               }
               callback_result.call(this, result);
+              return result;
             } else {
               callback_result.call(this, result);
+              return result;
             }
           });
     } catch (e) {
@@ -462,6 +464,7 @@ class Store {
     );
   }
 
+  //#region Local storage management
   /* ************************* */
   /* LOCAL STORAGE MANAGEMENT */
   static getStore() {
@@ -506,7 +509,9 @@ class Store {
     localStorage.setItem("animationStatus", JSON.stringify(status));
   }
   /* ************************* */
+  //#endregion
 
+  //#region Essential crud
   /* ************** */
   /* essential crud (entries) - create, read, update, delete */
   addEntry(entry) {
@@ -646,7 +651,9 @@ class Store {
 
   }
   /* ************ */
+  //#endregion
 
+  //#region Filter/Sort/Partition
   /* **************************** */
   /* (ENTRIES) FILTER/SORT/PARTITION/ */
   searchBy(entries, searchtype, value) {
@@ -714,6 +721,8 @@ class Store {
     }
   }
   /* **************************** */
+  //#endregion
+
 
   /* *************************************** */
   /* SEGMENT ENTRIES FOR SPECIFIC VIEWS (YEAR/MONTH/...ect)*/
@@ -914,6 +923,71 @@ class Store {
 
   /* ************************************* */
 
+  //#region iCal Subs
+  /* ********************* */
+  /*  ICAL SUBSCRIPTIONS */
+  addNewSub(url) {
+    l.log("Add new sub - " + url, "info", "ical");
+    if(!this.online_ready) {
+      console.log("Client is in offline mode");
+      console.log("Adding to offline queue", {
+          func: this.addNewSub,
+          args: [url]
+      });
+      this.offline_queue.push({
+          func: this.addNewSub,
+          args: [url]
+      });
+      return;
+    }
+
+    let urlencoded = new URLSearchParams();
+    urlencoded.append("url", url);
+    request_body.call(this, "/" + this.user.id + "/ical", urlencoded, function(response) {
+      let iCalID = JSON.parse(response).response.id;
+      console.log("new iCal ID: " + iCalID);
+
+      renderViews(context, datepickerContext, this);
+    }, 'POST', true);
+  }
+  deleteSub(iCalSubID) {
+    l.log("Deleting sub - " + iCalSubID, "info", "ical");
+    if(!this.online_ready) {
+      console.log("Client is in offline mode");
+      console.log("Adding to offline queue", {
+        func: this.deleteSub,
+        args: [iCalSubID]
+      });
+      this.offline_queue.push({
+        func: this.deleteSub,
+        args: [iCalSubID]
+      });
+      return;
+    }
+
+    request_body.call(this, "/" + this.user.id + "/ical/" + iCalSubID, {}, function(response) {
+      let res = JSON.parse(response);
+      console.log("Deleted iCal ID: " + res);
+
+      renderViews(context, datepickerContext, this);
+    }, 'DELETE', true);
+  }
+  async getSubs(callback) {
+    l.log("getting subs", "info", "ical");
+    if(!this.online_ready) {
+      return false;
+    }
+
+    let response = await request_get.call(this, "/" + this.user.id + "/ical", function (response) {}, true);
+    response = JSON.parse(response);
+    callback(response);
+    return response;
+  }
+
+  /* ************************************* */
+  //#endregion
+
+  //#region Category Management
   /* ********************* */
   /*  CATEGORY MANAGEMENT */
   addNewCtg(categoryName, color) {
@@ -1195,7 +1269,9 @@ class Store {
     }
   }
   /* ********************* */
+  //#endregion
 
+  //#region Keyboard Shortcuts
   /* ***************************** */
   /*  KEYBOARD SHORTCUT MANAGEMENT */
   getShortcuts() {
@@ -1222,7 +1298,9 @@ class Store {
     return status !== null ? status : true;
   }
   /* ***************************** */
+  //#endregion
 
+  //#region Animation
   /* ***************************** */
   /*  ANIMATION MANAGEMENT */
 
@@ -1236,7 +1314,9 @@ class Store {
     Store.setAnimationStatus(status);
   }
   /* ***************************** */
+  //#endregion
 
+  //#region Overlay
   /* ******************** */
   /*  OVERLAY MANAGEMENT */
   // see readme @ --overlay management-- for more info
@@ -1267,7 +1347,9 @@ class Store {
     return this.activeOverlay.size > 0;
   }
   /* ******************** */
+  //#endregion
 
+  //#region JSON Upload & Download
   /* ************************ */
   /*  JSON UPLOAD & DOWNLOAD */
   validateUserUpload(userUpload) {
@@ -1316,6 +1398,7 @@ class Store {
     return this.userUpload;
   }
   /* ************************ */
+  //#endregion
 
   /* ******************************************* */
   /*  STATE MANAGEMENT : RENDERING / RESET / RESIZE */
