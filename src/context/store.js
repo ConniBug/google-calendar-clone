@@ -287,6 +287,7 @@ class Store {
         return;
       }
 
+      console.log("Connecting to websocket server. (" + this.ws_url + ")");
       let ws = new WebSocket(this.ws_url, 'echo-protocol');
       ws.root = this;
 
