@@ -50,7 +50,7 @@ async function log(message, caller, type = "DEBUG", callingFunction = "N/A") {
     if (getLogLevelNum(type) > getLogLevelNum(logLevel)) {
         return;
     }
-    maxSize = 22
+    maxSize = 17
 
     time = getDateTime();
 
@@ -64,9 +64,6 @@ async function log(message, caller, type = "DEBUG", callingFunction = "N/A") {
         console.log(caller);
 
         StartMessage += type;
-        if(isMailSetup) {
-            sendMail(message, "Server Error");
-        }
     }
     else if (type == "WARNING") StartMessage += type;
     else if (type == "GENERIC") StartMessage += type;
