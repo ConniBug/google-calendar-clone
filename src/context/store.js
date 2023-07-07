@@ -313,7 +313,9 @@ class Store {
       };
 
       ws.onmessage = function (evt) {
+        let store = Store.getStore();
         let msg = JSON.parse(evt.data);
+        let id;
         switch (msg.type) {
           case "auth":
             if (msg.status !== "success") {
@@ -338,14 +340,44 @@ class Store {
           case "new_event":
             l.debug("New event created on another device or by the server", "Websocket");
             let event = msg.data;
-            if(this.root.store.find(e => e.id === event.id)) {
-                l.verbose("Event already exists, ignoring", "Websocket");
+            if(store.find(e => e.id === event.id)) {
+              console.log(e);
+              l.verbose("Event already exists, ignoring", "Websocket");
+              return
+            }
+            store.push(event);
+            Store.setStore(store);
+            location.reload();
+            break;
+          case "delete_event":
+            l.debug("Event deleted on another device or by the server", "Websocket");
+            id = msg.data;
+            if(!store.find(e => e.id === id)) {
+                l.verbose("Event does not exist, ignoring", "Websocket");
                 return
             }
-            this.root.store.push(event);
-            Store.setStore(this.root.store);
+            store = store.filter(e => e.id !== id);
+            Store.setStore(store);
             location.reload();
-            return
+            break;
+          case "update_event":
+            l.debug("Event updated on another device or by the server", "Websocket");
+            id = msg.data.id;
+            let update = msg.data.update;
+            let before = JSON.parse(JSON.stringify(store.find(e => e.id === id)));
+
+            store = store.map(e => {
+                if(e.id === id)
+                    return {...e, ...update};
+                return e;
+            });
+            if(before !== store.find(e => e.id === id)) {
+                l.verbose("Event didn't change, ignoring", "Websocket");
+                return
+            }
+            Store.setStore(store);
+            location.reload();
+            break;
           default:
             l.debug("Message is received: ", "Websocket");
             console.log(msg);
