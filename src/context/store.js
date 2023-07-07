@@ -287,17 +287,7 @@ class Store {
         return;
       }
 
-      let ws = 0;
-      if(this.ws_url.startsWith("wss://")) {
-        let url = this.ws_url.replace("wss://", "");
-        ws = new WebSocket("wss://" + url, 'echo-protocol');
-      }
-      else if(this.ws_url.startsWith("ws://")) {
-        let url = this.ws_url.replace("wss://", "");
-        ws = new WebSocket("wss://" + url, 'echo-protocol');
-      }
-      else
-        ws = new WebSocket("wss://" + this.ws_url, 'echo-protocol');
+      let ws = new WebSocket("wss://" + this.ws_url, 'echo-protocol');
 
       console.log("Connecting to websocket server. (" + this.ws_url + ")");
       // let ws = new WebSocket(this.ws_url, 'echo-protocol');
