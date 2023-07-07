@@ -314,6 +314,7 @@ class Store {
 
       ws.onmessage = function (evt) {
         let store = Store.getStore();
+        let ctg = Store.getCtg();
         let msg = JSON.parse(evt.data);
         let id;
         switch (msg.type) {
@@ -347,6 +348,28 @@ class Store {
             }
             store.push(event);
             Store.setStore(store);
+            location.reload();
+            break;
+          case "new_calendar":
+            l.debug("New calendar created on another device or by the server", "Websocket");
+            let calendar = msg.data;
+            if(Store.getCtg()[calendar.id]) {
+              l.verbose("Calendar already exists, ignoring", "Websocket");
+              return
+            }
+            ctg[calendar.id] = calendar;
+            Store.setCtg(ctg);
+            location.reload();
+            break;
+          case "delete_calendar":
+            l.debug("Calendar deleted on another device or by the server", "Websocket");
+            id = msg.data;
+            if(!(Store.getCtg()[id])) {
+              l.verbose("Calendar does not exist, ignoring", "Websocket");
+              return
+            }
+            delete ctg[id];
+            Store.setCtg(ctg);
             location.reload();
             break;
           case "delete_event":
@@ -414,7 +437,7 @@ class Store {
       json.forEach(e => {
         build.push({
           "id": e.id,
-          "category": e.calanderID,
+          "category": e.calendarID,
           "completed": false,
           "description": e.description,
           "location": e.location || "N/A",
@@ -446,7 +469,7 @@ class Store {
       let build = {};
       build.default = { name: "default", color: colors.blue[4], active: true, id: 0 };
 
-      json.calanders.forEach(e => {
+      json.calendars.forEach(e => {
         build[e.id] = {
           "id": e.id,
           "name": e.name,
@@ -585,7 +608,7 @@ class Store {
     console.log(`Delete entry: ${delete_id}`);
 
     let urlencoded = new URLSearchParams();
-    request_body.call(this,"/" + this.user.id + "/events/calander_id/" + delete_id, urlencoded, function (result) {
+    request_body.call(this,"/" + this.user.id + "/events/calendar_id/" + delete_id, urlencoded, function (result) {
       console.log("Delete status: ", result);
 
       this.store = this.store.filter((entry) => entry.id !== delete_id);
@@ -1041,7 +1064,7 @@ class Store {
     let urlencoded = new URLSearchParams();
     urlencoded.append("name", categoryName);
     urlencoded.append("colour", color);
-    request_body.call(this, "/" + this.user.id + "/events/calander", urlencoded, function(response) {
+    request_body.call(this, "/" + this.user.id + "/calendar", urlencoded, function(response) {
       let calID = JSON.parse(response).response.id;
 
       console.log("CalID: " + calID);
@@ -1063,8 +1086,8 @@ class Store {
     console.log("Delete category - " + category);
 
     let urlencoded = new URLSearchParams();
-    urlencoded.append("CalanderID", category);
-    request_body.call(this, "/" + this.user.id + "/calander", urlencoded, function(response) {
+    urlencoded.append("CalendarID", category);
+    request_body.call(this, "/" + this.user.id + "/calendar", urlencoded, function(response) {
       let status = JSON.parse(response).response.status;
 
       console.log("Deleted category: " + category + " - status: " + status);

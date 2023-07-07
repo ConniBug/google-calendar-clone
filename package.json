@@ -1,5 +1,5 @@
 {
-  "name": "calander-front",
+  "name": "calendar-front",
   "version": "1.0.0",
   "description": "zero dependency clone of google calendar written in vanilla javascript",
   "scripts": {

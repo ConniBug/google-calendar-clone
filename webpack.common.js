@@ -78,7 +78,7 @@ module.exports = {
             "productivity"
           ],
 
-          name: "Calander",
+          name: "Calendar",
           short_name: "GCal",
           description: "Lil gcal clone",
           background_color: '#e5bdff',

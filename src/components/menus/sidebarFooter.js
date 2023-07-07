@@ -12,11 +12,76 @@ const infopopupBody = document.querySelector(".sbip-content");
 
 
 export default function handleSidebarFooter(store) {
+  const style = `
+<style>
+.changelog {
+    margin-bottom: 1rem;
+}
+.changelog__version {
+    margin-bottom: 0.5rem;
+}
+.changelog__version-title {
+    margin-bottom: 0.25rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+.changelog__version-date {
+    font-size: 0.75rem;
+    font-weight: 300;
+}
+.changelog__description {
+    margin-bottom: 0.5rem;
+}
+.changelog__changes {
+    margin-bottom: 0.5rem;
+}
+.changelog__changes ul {
+    margin-left: 1rem;
+}
+.changelog__changes ul li {
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 300;
+}
+</style>
+`;
+  const log = [
+    {
+        version: "0.0.0",
+        date: "July 7, 2023",
+        description: "Added changelog :D",
+        changes: [
+            "Added changelog :D",
+            "Added iCal GET/DELETE backend, additionally added a simple frontend for temporary use",
+            "Added SSL to the websocket",
+            "Added webhook events for calendar creation and deletion",
+            "Fixed issues with websockets CORS policies",
+        ]
+    }
+  ]
+  let data = "";
+  for (let i = 0; i < log.length; i++) {
+    data += `
+    <div class="changelog">
+      <div class="changelog__version">
+        <h3 class="changelog__version-title">${log[i].version}</h3>
+        <p class="changelog__version-date">${log[i].date}</p>
+      </div>
+      <div class="changelog__description">
+        <p>${log[i].description}</p>
+      </div>
+      <div class="changelog__changes">
+        <ul>
+    `;
+    for (let j = 0; j < log[i].changes.length; j++)
+        data += `<li>${log[i].changes[j]}</li>`;
 
+    data += `</ul></div></div>`;
+  }
   const infoContent = {
-    notes: {
-      title: "Breakdown of project & current status",
-      content: "These are my project notes",
+    changelog: {
+      title: "Project Changelog",
+      content: `${style}<div class="container">${data}</div>`
     },
     privacy: {
       title: "Cookies and Data Privacy",
@@ -39,7 +104,7 @@ export default function handleSidebarFooter(store) {
 
   function setInfoContent(selection) {
     infopopupTitle.innerText = infoContent[selection].title;
-    infopopupBody.innerText = infoContent[selection].content;
+    infopopupBody.innerHTML = infoContent[selection].content;
   }
 
   function handleSelectInfoChange(e) {
@@ -62,7 +127,7 @@ export default function handleSidebarFooter(store) {
   }
 
   function openInfoPopup(selection) {
-    const selections = ['notes', 'privacy', 'terms'];
+    const selections = ['changelog', 'privacy', 'terms'];
     const idx = selections.indexOf(selection);
     selectInfo.selectedIndex = idx;
 
@@ -73,12 +138,12 @@ export default function handleSidebarFooter(store) {
   }
 
   function delegateSidebarFooterEvents(e) {
-    const projectNotes = getClosest(e, ".sb__project-notes");
+    const projectChangelog = getClosest(e, ".sb__project-changelog");
     const privacy = getClosest(e, ".sb__privacy");
     const terms = getClosest(e, ".sb__terms");
 
-    if (projectNotes) {
-      openInfoPopup("notes");
+    if (projectChangelog) {
+      openInfoPopup("changelog");
       return;
     }
 
