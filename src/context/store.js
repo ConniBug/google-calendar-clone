@@ -292,7 +292,6 @@ class Store {
 
       console.log("Connecting to websocket server. (" + this.ws_url + ")");
       // let ws = new WebSocket(this.ws_url, 'echo-protocol');
-      // ws.root = this;
 
       ws.onopen = function () {
         l.debug("Websocket connection established.", "Websocket");
@@ -363,7 +362,7 @@ class Store {
         l.log("Attempting to reconnect in 5 seconds", "Websocket");
         setTimeout(() => {
           l.log("Attempting to reconnect", "Websocket");
-          websocket_connect.call(this.root);
+          websocket_connect.call(this);
         }, 5000);
       };
     }
