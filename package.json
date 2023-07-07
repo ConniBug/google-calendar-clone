@@ -4,9 +4,8 @@
   "description": "zero dependency clone of google calendar written in vanilla javascript",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "dev": "webpack serve --open",
-    "deploy": "gh-pages -d dist"
+    "build": "webpack --config webpack.dev.js",
+    "dev": "npm i && webpack serve --config webpack.dev.js"
   },
   "repository": {
     "type": "git",
@@ -44,6 +43,7 @@
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1",
     "webpack-manifest-plugin": "^5.0.0",
+    "webpack-merge": "^5.9.0",
     "webpack-nano": "^1.1.1",
     "webpack-pwa-manifest": "^4.3.0"
   },

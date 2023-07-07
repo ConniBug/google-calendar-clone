@@ -14,19 +14,6 @@ const path = require('path');
 
 module.exports = {
   entry: './src/index.js',
-  mode: 'development',
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'dist'),
-    },
-    host: '0.0.0.0',
-    port: 30000,
-    allowedHosts: 'all',
-    open: true,
-    hot: true,
-    compress: true,
-  },
-  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -131,10 +118,10 @@ module.exports = {
           ],
         }
     ),
-    new InjectManifest({
-        swSrc: path.resolve(__dirname, './src/sw.js'),
-        swDest: 'service-worker.js',
-    })
+    // new InjectManifest({
+    //     swSrc: path.resolve(__dirname, './src/sw.js'),
+    //     swDest: 'service-worker.js',
+    // })
   ],
 
   optimization: {
