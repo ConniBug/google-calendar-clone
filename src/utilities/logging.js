@@ -28,19 +28,19 @@ function getDateTime() {
 
 logLevel = "LEGITALL";
 function getLogLevelNum(level) {
-    if (level == "TESTING") return 0;
-    if (level == "GENERIC") return 2;
-    if (level == "DEBUG")   return 3;
-    if (level == "WARNING") return 5;
-    if (level == "ERROR")   return 7;
-    if (level == "VERBOSE") return 9;
-    if (level == "CRITICAL") return 11;
-    if (level == "ALL")     return 15;
+    if (level === "TESTING") return 0;
+    if (level === "GENERIC") return 2;
+    if (level === "DEBUG")   return 3;
+    if (level === "WARNING") return 5;
+    if (level === "ERROR")   return 7;
+    if (level === "VERBOSE") return 9;
+    if (level === "CRITICAL") return 11;
+    if (level === "ALL")     return 15;
 
     // Debugging stuff.
-    if (level == "TIMINGS") return 20;
+    if (level === "TIMINGS") return 20;
 
-    if (level == "LEGITALL") return 100;
+    if (level === "LEGITALL") return 100;
 
     log("Unsure what log level " + level.red + " belongs to.", "GENERIC");
     return 4;
@@ -54,23 +54,23 @@ async function log(message, caller, type = "DEBUG", callingFunction = "N/A") {
 
     time = getDateTime();
 
-    if (callingFunction == "N/A") {
+    if (callingFunction === "N/A") {
         StartMessage = `[${time}] - [`;
     } else {
         StartMessage = `[${time}] - [${callingFunction}] - [`;
     }
 
-    if (type == "ERROR") {
+    if (type === "ERROR") {
         console.log(caller);
 
         StartMessage += type;
     }
-    else if (type == "WARNING") StartMessage += type;
-    else if (type == "GENERIC") StartMessage += type;
-    else if (type == "DEBUG") StartMessage += type;
-    else if (type == "VERBOSE") StartMessage += type;
-    else if (type == "TESTING") StartMessage += type;
-    else if (type == "CRITICAL") StartMessage += type
+    else if (type === "WARNING") StartMessage += type;
+    else if (type === "GENERIC") StartMessage += type;
+    else if (type === "DEBUG") StartMessage += type;
+    else if (type === "VERBOSE") StartMessage += type;
+    else if (type === "TESTING") StartMessage += type;
+    else if (type === "CRITICAL") StartMessage += type
     else StartMessage += type;
 
     left = maxSize - StartMessage.length;
