@@ -70,11 +70,12 @@
         }
 
         function login() {
+          console.log("Called login");
           const email = document.getElementById('email').value;
           const password = document.getElementById('password').value;
 
 
-          var urlencoded = new URLSearchParams();
+          let urlencoded = new URLSearchParams();
           urlencoded.append("email", email);
           urlencoded.append("password", password);
 
@@ -85,7 +86,7 @@
 
             localStorage.setItem('user', JSON.stringify(data));
 
-            var overlay = document.getElementById('overlay');
+            let overlay = document.getElementById('overlay');
             overlay.style.display = 'none';
             const login_container = document.getElementById('login_page-container');
             login_container.style.display = 'none';
@@ -1056,7 +1057,7 @@
   <aside class="sb__info-popup hide-sb-info-popup">
     <div class="sb__info-popup-header">
       <select name="popup-info" class="select-popup-info">
-        <option value="notes">Project Notes</option>
+        <option value="changelog">Changelog</option>
         <option value="privacy">Privacy</option>
         <option value="terms">Terms</option>
       </select>

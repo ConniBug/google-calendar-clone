@@ -158,7 +158,7 @@ function request_get(path, callback_result, authed = true, callback_error = null
                 const login_container = document.getElementById('login_page-container');
                 login_container.style.display = 'block';
 
-                return "Un-Authorised!"
+                return "Un-Authorised!";
               }
               callback_result.call(this, result);
               return result;
