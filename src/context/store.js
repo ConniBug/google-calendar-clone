@@ -344,7 +344,7 @@ class Store {
             if(store.find(e => e.id === event.id)) {
               console.log(e);
               l.verbose("Event already exists, ignoring", "Websocket");
-              return
+              break;
             }
             store.push(event);
             Store.setStore(store);
@@ -355,7 +355,7 @@ class Store {
             let calendar = msg.data;
             if(Store.getCtg()[calendar.id]) {
               l.verbose("Calendar already exists, ignoring", "Websocket");
-              return
+              break;
             }
             ctg[calendar.id] = calendar;
             Store.setCtg(ctg);
@@ -363,10 +363,10 @@ class Store {
             break;
           case "delete_calendar":
             l.debug("Calendar deleted on another device or by the server", "Websocket");
-            id = msg.data;
+            id = msg.data.id;
             if(!(Store.getCtg()[id])) {
               l.verbose("Calendar does not exist, ignoring", "Websocket");
-              return
+              break;
             }
             delete ctg[id];
             Store.setCtg(ctg);
@@ -374,10 +374,13 @@ class Store {
             break;
           case "delete_event":
             l.debug("Event deleted on another device or by the server", "Websocket");
-            id = msg.data;
-            if(!store.find(e => e.id === id)) {
+            id = msg.data.id;
+            if(!store.find(e => {
+              console.log(`${e.id} === ${id}`);
+              return(e.id === id);
+            })) {
                 l.verbose("Event does not exist, ignoring", "Websocket");
-                return
+                break;
             }
             store = store.filter(e => e.id !== id);
             Store.setStore(store);
@@ -399,7 +402,7 @@ class Store {
             });
             if(before !== store.find(e => e.id === id)) {
                 l.verbose("Event didn't change, ignoring", "Websocket");
-                return
+                break;
             }
             Store.setStore(store);
             location.reload();
