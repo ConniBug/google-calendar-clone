@@ -56,15 +56,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// function showOverlay() {
-//     var overlay = document.getElementById('overlay');
-//     overlay.style.display = 'flex';
-// }
-// function hideOverlay() {
-//     var overlay = document.getElementById('overlay');
-//     overlay.style.display = 'none';
-// }
-
 /*!*************************************!*/
 setAppDefaults(context, store);
 renderViews(context, datepickerContext, store);
