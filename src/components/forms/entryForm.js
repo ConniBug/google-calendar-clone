@@ -163,7 +163,8 @@ export default function setEntryForm(context, store, datepickerContext) {
     let nextHourTitle = `${+nextHour.getHours() % 12}:${+nextHour.getMinutes() == 0 ? "00" : nextHour.getMinutes()}${md}`;
 
     endTimeInput.setAttribute("data-form-time", nextHourString);
-    endTimeInput.textContent = nextHourTitle;
+    // endTimeInput.textContent = nextHourTitle;
+    endTimeInput.textContent = nextHourString;
   }
 
   function createTimepicker(coords, currentTime, end, endLimit) {
