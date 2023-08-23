@@ -83,8 +83,8 @@ class FormConfig {
     );
 
     // darn yankee time
-    timeinput.textContent = `${+date.getHours() === 0 || +date.getHours() === 12 ? 12 : date.getHours() % 12}:${minutes}${date.getHours() < 12 ? "am" : "pm"}`;
-
+    // timeinput.textContent = `${+date.getHours() === 0 || +date.getHours() === 12 ? 12 : date.getHours() % 12}:${minutes}${date.getHours() < 12 ? "am" : "pm"}`;
+    timeinput.textContent = timeformatted;
     dateinput.setAttribute("data-form-date", dateFormatted);
     dateinput.textContent = `${this.monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
   }
