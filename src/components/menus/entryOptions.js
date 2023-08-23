@@ -98,6 +98,29 @@ export default function getEntryOptionModal(context, store, entry, datepickerCon
     document.removeEventListener("keydown", handleEntryOptionKD);
   }
 
+  function convertTo24Hr(strTime)  {
+    // TODO: This should only be converting the displayed ui time when its enabled in the users ui config
+
+    if(!(strTime.includes(" "))) {
+      strTime = strTime.replace("p", " p");
+      strTime = strTime.replace("a", " a");
+    }
+
+    const [time, modifier] = strTime.split(' ');
+    let [hours, minutes] = time.split(':');
+
+    if (minutes === undefined)
+      minutes = "00";
+
+    if (hours === '12')
+      hours = '00';
+
+    if (modifier.toUpperCase() === 'PM')
+      hours = parseInt(hours, 10) + 12;
+
+    return `${hours}:${minutes}`;
+  }
+
   function setEntryDefaults() {
     entryOptionsWrapper.classList.remove("entry__options--hidden");
     entryOptionsOverlay.classList.remove("entry__options--hidden");
@@ -111,10 +134,23 @@ export default function getEntryOptionModal(context, store, entry, datepickerCon
 
     const getDateTime = formatEntryOptionsDate(start, end);
 
-    console.log("Displaying time as " + getDateTime.time);
     console.log("setEntryDefaults");
+    console.log("Date was " + getDateTime.date);
 
-    entryOptionsDateHeader.textContent = getDateTime.date;
+    let result = getDateTime.date.match(/\((.*?)\)/gm)[0].replace("(", "").replace(")", "");    entryOptionsDateHeader.textContent = result[1];
+    let [first, second] = result.split(" – ");
+
+    if(!(first.includes("am") || first.includes("pm")))
+      first += second.includes("pm") ? "pm" : "am";
+
+    first = convertTo24Hr(first);
+    second = convertTo24Hr(second);
+
+    entryOptionsDateHeader.textContent = getDateTime.date.split("(")[0] + "(" + first + " – " + second + ")";
+
+    console.log("Displaying date as " + entryOptionsDateHeader.textContent);
+
+    // entryOptionsDateHeader.textContent = getDateTime.date;
     if (getDateTime.time !== null) {
       if (getDateTime.time === undefined) {
         let tempdate = new Date();
