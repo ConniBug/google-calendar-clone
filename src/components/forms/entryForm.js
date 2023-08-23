@@ -250,7 +250,9 @@ export default function setEntryForm(context, store, datepickerContext) {
         }
 
         timepickerTime.setAttribute("data-tp-time", attr);
-        timepickerTime.textContent = `${hour}:${min}${md[houridx]}`;
+        // timepickerTime.textContent = `${hour}:${min}${md[houridx]}`;
+
+        timepickerTime.textContent = attr;
         count++;
 
         if (!end) {
