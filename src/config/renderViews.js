@@ -391,7 +391,8 @@ export default function renderViews(context, datepickerContext, store) {
       collapsebtn.classList.add("hide-cbt");
     }
 
-    if (option === comp && !initialRender) return;
+    if (option === comp && !initialRender)
+      return;
     closeOptionsModal();
     context.setComponent(option);
     fullRender(option);

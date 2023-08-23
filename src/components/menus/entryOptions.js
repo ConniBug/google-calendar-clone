@@ -110,6 +110,10 @@ export default function getEntryOptionModal(context, store, entry, datepickerCon
     }
 
     const getDateTime = formatEntryOptionsDate(start, end);
+
+    console.log("Displaying time as " + getDateTime.time);
+    console.log("setEntryDefaults");
+
     entryOptionsDateHeader.textContent = getDateTime.date;
     if (getDateTime.time !== null) {
       if (getDateTime.time === undefined) {

@@ -43,19 +43,53 @@ export default function setViews(component, context, store, datepickerContext) {
   }
   // window.removeEventListener("resize", store.getResizeHandle("month"));
 
+  const convertTo24Hr = (strTime) => {
+    // TODO: This should only be converting the displayed ui time when its enabled in the users ui config
+
+    if(!(strTime.includes(" "))) {
+      strTime = strTime.replace("p", " p");
+      strTime = strTime.replace("a", " a");
+    }
+
+    const [time, modifier] = strTime.split(' ');
+    let [hours, minutes] = time.split(':');
+
+    if (minutes === undefined)
+      minutes = "00";
+
+    if (hours === '12')
+      hours = '00';
+
+    if (modifier.toUpperCase() === 'PM')
+      hours = parseInt(hours, 10) + 12;
+
+    return `${hours}:${minutes}`;
+  }
+
   function initView(component) {
+    let cells;
     switch (component) {
       case "day":
         context.setComponent(component);
         setHeader(context, component);
         setDayView(context, store, datepickerContext);
         dayComponent.classList.remove("hide-view");
+
+        cells = document.getElementsByClassName("dv-sidegrid--cell");
+        for(let i = 0; i < cells.length; i++) {
+          cells[i].textContent = convertTo24Hr(cells[i].textContent);
+        }
         break;
       case "week":
         context.setComponent(component);
         setHeader(context, component);
         setWeekView(context, store, datepickerContext);
         weekComponent.classList.remove("hide-view");
+
+        cells = document.getElementsByClassName("sidegrid-cell");
+        for(let i = 0; i < cells.length; i++) {
+          cells[i].textContent = convertTo24Hr(cells[i].textContent);
+        }
         break;
       case "month":
         context.setComponent(component);
@@ -76,6 +110,20 @@ export default function setViews(component, context, store, datepickerContext) {
         setHeader(context, component, store);
         setListView(context, store, datepickerContext);
         listComponent.classList.remove("hide-view");
+
+        cells = document.getElementsByClassName("rowgroup--cell__time");
+        for(let i = 0; i < cells.length; i++) {
+
+          let [first, second] = cells[i].textContent.split(" – ");
+
+          if(!(first.includes("am") || first.includes("pm")))
+            first += second.includes("pm") ? "pm" : "am";
+
+          first = convertTo24Hr(first);
+          second = convertTo24Hr(second);
+
+          cells[i].textContent = first + " – " + second;
+        }
         break;
       default:
         context.setComponent("month");
