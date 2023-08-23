@@ -83,6 +83,15 @@
           request_body.call(this, "/login", urlencoded, function (result) {
             console.log("Server events");
             let data = JSON.parse(result)["response"];
+
+            if(data === "Un-Authenticated") {
+              localStorage.setItem('user', "");
+
+              document.getElementById('password').value = "";
+
+              // TODO: Add notification for failed login attempts
+              return;
+            }
             console.log(data);
 
             localStorage.setItem('user', JSON.stringify(data));
