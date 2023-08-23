@@ -1,7 +1,7 @@
 {
   "name": "calendar-front",
   "version": "1.0.0",
-  "description": "zero dependency clone of google calendar written in vanilla javascript",
+  "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.dev.js",
@@ -11,18 +11,8 @@
     "type": "git",
     "url": "git+https://github.com/ConniBug/google-calendar-clone.git"
   },
-  "keywords": [
-    "google-calendar",
-    "html",
-    "css",
-    "javascript",
-    "calendar",
-    "clone",
-    "google",
-    "vanilla",
-    "vanillajs"
-  ],
-  "author": "chase ottofy",
+  "keywords": [],
+  "author": "Conni Bilham (me@conni.lgbt)",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/ConniBug/google-calendar-clone/issues"

@@ -681,7 +681,7 @@ class Store {
   }
 
   updateEntry(id, data) {
-    l.log(`Update entry: ${id} with`, data);
+    l.log(`Update entry: ${id} with ${JSON.stringify(data)}`);
 
     const entryBefore = JSON.parse(JSON.stringify(this.getEntry(id)));
 
@@ -689,11 +689,16 @@ class Store {
     for ( let j in entryBefore ) {
       if(j === "coordinates")
         continue;
-      if ( entryBefore[j] !== data[j] ) {
-        if(data[j] === undefined)
-          continue;
-        urlencoded.append(j, data[j]);
+      if(entryBefore[j] === data[j])
+        continue;
+      if(data[j] === undefined)
+        continue;
+      if(j === "category"){
+        console.log("Category: ", data[j]);
+        urlencoded.append("calendarID", data[j]);
+        continue;
       }
+      urlencoded.append(j, data[j]);
     }
 
     request_body.call(this, "/" + this.user.id + "/events/1/" + id, urlencoded, function (result) {
