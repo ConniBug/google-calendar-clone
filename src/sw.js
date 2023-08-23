@@ -2,32 +2,22 @@ import { precacheAndRoute } from 'workbox-precaching/precacheAndRoute';
 
 precacheAndRoute(self.__WB_MANIFEST);
 
-var title = 'Yay a message.';
-var body = 'A message.';
-var icon = '/images/icon-192x192.png';
-var tag = 'tag';
+self.addEventListener('push', event => {
+    const options = {
+        body: event.data.text(),
+        // icon: 'path-to-notification-icon.png', // Path to your notification icon
+        vibrate: [100, 50, 100],
+        data: {
+            dateOfArrival: Date.now(),
+            primaryKey: '1',
+        },
+    };
 
-async function init() {
-    if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
-        console.warn('Notifications aren\'t supported.');
-        return;
-    }
-    if (Notification.permission === 'denied') {
-        console.warn('The user has blocked notifications.');
-        return;
-    }
-    // if (!('PushManager' in window)) {
-    //     console.warn('Push messaging isn\'t supported.');
-    //     return;
-    // }
+    event.waitUntil(
+        self.registration.showNotification('Test title', options)
+    );
+});
 
-    // const registration = await navigator.serviceWorker.getRegistration();
-    // registration.showNotification(title, {
-    //     body: body,
-    //     icon: icon,
-    //     tag: tag
-    // });
-
-}
-
-init();
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+});
