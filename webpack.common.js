@@ -118,10 +118,10 @@ module.exports = {
           ],
         }
     ),
-    // new InjectManifest({
-    //     swSrc: path.resolve(__dirname, './src/sw.js'),
-    //     swDest: 'service-worker.js',
-    // })
+    new InjectManifest({
+        swSrc: path.resolve(__dirname, './src/sw.js'),
+        // swDest: 'service-worker.js',
+    })
   ],
 
   optimization: {
