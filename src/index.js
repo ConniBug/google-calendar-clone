@@ -56,15 +56,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// function showOverlay() {
-//     var overlay = document.getElementById('overlay');
-//     overlay.style.display = 'flex';
-// }
-// function hideOverlay() {
-//     var overlay = document.getElementById('overlay');
-//     overlay.style.display = 'none';
-// }
-
 /*!*************************************!*/
 setAppDefaults(context, store);
 renderViews(context, datepickerContext, store);
@@ -72,5 +63,8 @@ renderViews(context, datepickerContext, store);
 if (window.Notification) {
     Notification.requestPermission((status) => {
         console.log('Status of the notification permission request:', status);
+
     });
+    let cont = "Test notif";
+    Notification.call(cont);
 }
