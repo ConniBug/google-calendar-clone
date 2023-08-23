@@ -78,6 +78,7 @@
           let urlencoded = new URLSearchParams();
           urlencoded.append("email", email);
           urlencoded.append("password", password);
+          urlencoded.append("refresh", "false");    // Prevent invalidating previous tokens
 
           request_body.call(this, "/login", urlencoded, function (result) {
             console.log("Server events");
