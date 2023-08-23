@@ -387,6 +387,9 @@ class Store {
             l.debug("Event updated on another device or by the server", "Websocket");
             id = msg.data.id;
             let update = msg.data.update;
+            if(update.calendarID !== undefined) {
+              update.category = update.calendarID;
+            }
             let before = JSON.parse(JSON.stringify(store.find(e => e.id === id)));
 
             store = store.map(e => {
