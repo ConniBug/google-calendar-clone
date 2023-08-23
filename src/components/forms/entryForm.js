@@ -163,7 +163,8 @@ export default function setEntryForm(context, store, datepickerContext) {
     let nextHourTitle = `${+nextHour.getHours() % 12}:${+nextHour.getMinutes() == 0 ? "00" : nextHour.getMinutes()}${md}`;
 
     endTimeInput.setAttribute("data-form-time", nextHourString);
-    endTimeInput.textContent = nextHourTitle;
+    // endTimeInput.textContent = nextHourTitle;
+    endTimeInput.textContent = nextHourString;
   }
 
   function createTimepicker(coords, currentTime, end, endLimit) {
@@ -277,7 +278,8 @@ export default function setEntryForm(context, store, datepickerContext) {
       let attr = e.target.getAttribute("data-tp-time");
 
       if (!end) {
-        startTimeInput.textContent = time;
+        // startTimeInput.textContent = time;
+        startTimeInput.textContent = attr;
         startTimeInput.setAttribute("data-form-time", attr);
 
         let [testhour, testminute] = attr.split(":").map(x => +x);
@@ -293,7 +295,8 @@ export default function setEntryForm(context, store, datepickerContext) {
           }
         }
       } else {
-        endTimeInput.textContent = time;
+        // endTimeInput.textContent = time;
+        endTimeInput.textContent = attr;
         endTimeInput.setAttribute("data-form-time", attr);
       }
       closetimepicker();
@@ -1090,8 +1093,10 @@ export default function setEntryForm(context, store, datepickerContext) {
     const getTimeAndMd = (hour, min) => {
       return `${+hour === 0 || +hour === 12 ? 12 : hour % 12}:${min}${hour < 12 ? "am" : "pm"}`;
     };
-    startTimeInput.textContent = getTimeAndMd(temphours, "00");
-    endTimeInput.textContent = getTimeAndMd(temphours, "30");
+    // startTimeInput.textContent = getTimeAndMd(temphours, "00");
+    // endTimeInput.textContent = getTimeAndMd(temphours, "30");
+    startTimeInput.textContent = `${temphours}:00`;
+    endTimeInput.textContent = `${temphours}:30`;
 
     // ****************************************** // 
     // submit button setup 
