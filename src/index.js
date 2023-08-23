@@ -63,5 +63,8 @@ renderViews(context, datepickerContext, store);
 if (window.Notification) {
     Notification.requestPermission((status) => {
         console.log('Status of the notification permission request:', status);
+
     });
+    let cont = "Test notif";
+    Notification.call(cont);
 }
