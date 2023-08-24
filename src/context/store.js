@@ -466,7 +466,7 @@ class Store {
         renderViews(context, datepickerContext, this);
       }
 
-      const alert_connection_lost = document.getElementById("alert__connection_lost__text");
+      const alert_connection_lost = document.getElementById("alert__connection_lost");
       const alert = new Alert(alert_connection_lost, {});
       alert.close();
 
