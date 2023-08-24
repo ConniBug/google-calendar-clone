@@ -324,11 +324,17 @@ class Store {
         let id;
         switch (msg.type) {
           case "auth":
+            let options;
+            const myModal = new Modal(document.getElementById('login_modal'), options);
             if (msg.status !== "success") {
+              myModal.show();
+
               l.warning("Authentication failed, token expired?", "Websocket");
               this.online_ready = false;
             }
             l.debug("Authentication successful", "Websocket");
+            myModal.hide();
+
             break;
           case "options":
             this.options = msg.options;

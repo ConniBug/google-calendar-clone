@@ -86,7 +86,7 @@ if (window.Notification) {
 
 let options;
 const myModal = new Modal(document.getElementById('login_modal'), options)
-myModal.show();
+myModal.hide();
 
 // Login button
 document.getElementById("login_modal__close").addEventListener("click", function () {
