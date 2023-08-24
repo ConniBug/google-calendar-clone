@@ -160,9 +160,6 @@ function request_get(path, callback_result, authed = true, callback_error = null
             if(authed) {
               let json = JSON.parse(result);
               if(json.error === "Un-Authorised!") {
-                const login_container = document.getElementById('login_page-container');
-                login_container.style.display = 'block';
-
                 let options;
                 const myModal = new Modal(document.getElementById('login_modal'), options);
                 myModal.show();
