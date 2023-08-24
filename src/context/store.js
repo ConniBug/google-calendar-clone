@@ -290,6 +290,11 @@ class Store {
 
     if(this.user.expiry < Date.now() / 1000) {
         console.warn("Token expired, any changes will not be saved.");
+        
+        let options;
+        const myModal = new Modal(document.getElementById('login_modal'), options);
+        myModal.show();
+        return;
     } else {
         console.log("Token is valid, logged in fine.");
     }
@@ -455,12 +460,8 @@ class Store {
     websocket_connect.call(this);
 
     request_get.call(this, "/" + this.user.id + "/events/1", function (result) {
-      // console.log("Server events");
       let last = this.store;
-      // Strip active vars
       let json = JSON.parse(result);
-      // l.log("Server updated events list - ");
-      // console.log(json);
 
       let build = [];
       json.forEach(e => {
