@@ -163,6 +163,10 @@ function request_get(path, callback_result, authed = true, callback_error = null
                 const login_container = document.getElementById('login_page-container');
                 login_container.style.display = 'block';
 
+                let options;
+                const myModal = new Modal(document.getElementById('login_modal'), options);
+                myModal.show();
+
                 return "Un-Authorised!";
               }
               callback_result.call(this, result);
@@ -195,6 +199,10 @@ function request_body(path, body, callback_result, method = 'POST', authed = tru
             if (authed) {
               let json = JSON.parse(result);
               if (json.error === "Un-Authorised!") {
+                let options;
+                const myModal = new Modal(document.getElementById('login_modal'), options);
+                myModal.show();
+
                 return "Un-Authorised!"
               }
               callback_result.call(this, result);
@@ -337,6 +345,7 @@ class Store {
 
               l.warning("Authentication failed, token expired?", "Websocket");
               this.online_ready = false;
+              break;
             }
             l.debug("Authentication successful", "Websocket");
             myModal.hide();
