@@ -47,6 +47,19 @@ export default function handleSidebarFooter(store) {
 `;
   const log = [
     {
+        version: "0.1.0",
+        date: "August 24, 2023",
+        description: "UI Improvements, 24hr time and offline support",
+        changes: [
+            "Redesigned the login page to be more user friendly",
+            "Users are now able to user the calendar without an internet connection",
+            "Added support for the UI to display times in 24hr format",
+            "Added alerts to notify the user when connection to the servers are lost"
+            "Bugfix - The server would not sync changes to the calander an event is in",
+            "Bug fix - Tokens were invalidated when logging in on a new device or browser",
+            "Bugfix - Incorrect login attempts where not made obvious to the user",
+    },
+    {
         version: "0.0.0",
         date: "July 7, 2023",
         description: "Added changelog :D",
