@@ -58,6 +58,7 @@ export default function handleSidebarFooter(store) {
             "Bugfix - The server would not sync changes to the calander an event is in",
             "Bug fix - Tokens were invalidated when logging in on a new device or browser",
             "Bugfix - Incorrect login attempts where not made obvious to the user",
+        ]
     },
     {
         version: "0.0.0",
