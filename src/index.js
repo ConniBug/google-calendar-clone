@@ -76,8 +76,6 @@ renderViews(context, datepickerContext, store);
 const alert_connection_lost = document.getElementById("alert__connection_lost__text");
 alert_connection_lost.textContent = lang.alerts.connection_lost;
 
-
-
 if (window.Notification) {
     Notification.requestPermission((status) => {
         console.log('Status of the notification permission request:', status);

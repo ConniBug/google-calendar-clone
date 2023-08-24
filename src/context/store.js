@@ -173,6 +173,9 @@ function request_get(path, callback_result, authed = true, callback_error = null
             }
           });
     } catch (e) {
+      const alert_connection_lost = document.getElementById("alert__connection_lost");
+      alert_connection_lost.style.display = 'block';
+
       console.log(e);
     }
   }
@@ -200,6 +203,9 @@ function request_body(path, body, callback_result, method = 'POST', authed = tru
             }
           });
     } catch (e) {
+      const alert_connection_lost = document.getElementById("alert__connection_lost");
+      alert_connection_lost.style.display = 'block';
+
       console.log(e);
     }
   }
@@ -473,8 +479,7 @@ class Store {
       }
 
       const alert_connection_lost = document.getElementById("alert__connection_lost");
-      const alert = new Alert(alert_connection_lost, {});
-      alert.close();
+      alert_connection_lost.style.display = 'none';
 
       const myModal = new Modal(document.getElementById('login_modal'), options)
       myModal.hide();
