@@ -1,5 +1,9 @@
 export default {
   labels: {
+    alerts: {
+      connection_lost: "Connection lost...",
+    },
+
     monthsLong: [
       'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
     ],
