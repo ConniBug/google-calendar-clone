@@ -54,7 +54,7 @@ export default function handleSidebarFooter(store) {
             "Redesigned the login page to be more user friendly",
             "Users are now able to user the calendar without an internet connection",
             "Added support for the UI to display times in 24hr format",
-            "Added alerts to notify the user when connection to the servers are lost"
+            "Added alerts to notify the user when connection to the servers are lost",
             "Bugfix - The server would not sync changes to the calander an event is in",
             "Bug fix - Tokens were invalidated when logging in on a new device or browser",
             "Bugfix - Incorrect login attempts where not made obvious to the user",
