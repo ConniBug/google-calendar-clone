@@ -7,6 +7,11 @@ import defautlKeyboardShortcuts from "../locales/kbDefault";
 import renderViews from "../config/renderViews";
 import context, {datepickerContext} from "./appContext";
 const colors = locales.colors;
+
+import 'bootstrap';
+import { Modal } from 'bootstrap'
+import { Alert } from 'bootstrap'
+
 /*
   this is a temporary list of store methods for development purposes, it is not a complete list of methods
 
@@ -461,11 +466,13 @@ class Store {
         renderViews(context, datepickerContext, this);
       }
 
-      let overlay = document.getElementById('overlay'); overlay.style.display = 'none';
-          overlay = document.getElementById('overlay_blank');overlay.style.display = 'none';
+      const alert_connection_lost = document.getElementById("alert__connection_lost__text");
+      const alert = new Alert(alert_connection_lost, {});
+      alert.close();
 
-      const login_container = document.getElementById('login_page-container');
-      login_container.style.display = 'none';
+      const myModal = new Modal(document.getElementById('login_modal'), options)
+      myModal.hide();
+
     }, true);
 
     request_get.call(this, "/" + this.user.id + "", function (result) {

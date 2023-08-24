@@ -18,7 +18,6 @@ import { Toast } from 'bootstrap'
 // (CSS)
 /*!*************************************!*/
 
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // <html>
