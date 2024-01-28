@@ -160,10 +160,6 @@ function request_get(path, callback_result, authed = true, callback_error = null
             if(authed) {
               let json = JSON.parse(result);
               if(json.error === "Un-Authorised!") {
-                let options;
-                const myModal = new Modal(document.getElementById('login_modal'), options);
-                myModal.show();
-
                 return "Un-Authorised!";
               }
               callback_result.call(this, result);
@@ -196,10 +192,6 @@ function request_body(path, body, callback_result, method = 'POST', authed = tru
             if (authed) {
               let json = JSON.parse(result);
               if (json.error === "Un-Authorised!") {
-                let options;
-                const myModal = new Modal(document.getElementById('login_modal'), options);
-                myModal.show();
-
                 return "Un-Authorised!"
               }
               callback_result.call(this, result);
@@ -290,11 +282,6 @@ class Store {
 
     if(this.user.expiry < Date.now() / 1000) {
         console.warn("Token expired, any changes will not be saved.");
-        
-        let options;
-        const myModal = new Modal(document.getElementById('login_modal'), options);
-        myModal.show();
-        return;
     } else {
         console.log("Token is valid, logged in fine.");
     }
@@ -305,6 +292,8 @@ class Store {
 
 
     function websocket_connect() {
+      return;
+
       if (!("WebSocket" in window)) {
         l.error("Device does not support websockets.", "Websocket");
         return;
@@ -340,17 +329,13 @@ class Store {
         let id;
         switch (msg.type) {
           case "auth":
-            let options;
-            const myModal = new Modal(document.getElementById('login_modal'), options);
             if (msg.status !== "success") {
-              myModal.show();
 
               l.warning("Authentication failed, token expired?", "Websocket");
               this.online_ready = false;
               break;
             }
             l.debug("Authentication successful", "Websocket");
-            myModal.hide();
 
             break;
           case "options":
@@ -487,9 +472,6 @@ class Store {
 
       const alert_connection_lost = document.getElementById("alert__connection_lost");
       alert_connection_lost.style.display = 'none';
-
-      const myModal = new Modal(document.getElementById('login_modal'), options)
-      myModal.hide();
 
     }, true);
 
