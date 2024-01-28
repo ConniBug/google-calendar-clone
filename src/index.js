@@ -35,9 +35,11 @@ const updateUI = async () => {
         }
     }
 
+    console.log("isAuthenticated", isAuthenticated);
     if(isAuthenticated) {
         const user = await auth0Client.getUser();
         console.log("user", user);
+        user.id = user.app_meta.uuid;
         localStorage.setItem('user', JSON.stringify(user));
         return;
     }
