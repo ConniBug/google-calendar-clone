@@ -151,7 +151,3 @@ if (window.Notification) {
         console.log('Status of the notification permission request:', status);
     });
 }
-
-let options;
-const myModal = new Modal(document.getElementById('login_modal'), options)
-myModal.hide();
