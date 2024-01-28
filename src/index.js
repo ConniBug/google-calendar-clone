@@ -40,6 +40,10 @@ const updateUI = async () => {
         const user = await auth0Client.getUser();
         console.log("user", user);
         user.id = user.app_meta.uuid;
+        this.user.token = await auth0Client.getTokenSilently();
+
+        console.log("user + token", user);
+
         localStorage.setItem('user', JSON.stringify(user));
         return;
     }
