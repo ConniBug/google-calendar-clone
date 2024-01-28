@@ -1,6 +1,76 @@
 import context, { datepickerContext } from "./context/appContext";
 import store from "./context/store";
 
+import { createAuth0Client } from '@auth0/auth0-spa-js';
+let auth0Client = null;
+const configureClient = async () => {
+    const config = {
+        "domain": "transgirl.uk.auth0.com",
+        "clientId": "FEiayN3D6JgRuTrsz3IoaApQcrDFEjz3"
+    };
+
+    auth0Client = await createAuth0Client({
+        domain: config.domain,
+        clientId: config.clientId
+    });
+};
+window.onload = async () => {
+    await configureClient();
+    updateUI();
+}
+
+const updateUI = async () => {
+    const isAuthenticated = await auth0Client.isAuthenticated();
+    const query = window.location.search;
+
+    if(query.includes("action=")) {
+        const action = query.split("action=")[1].split("&")[0];
+        console.log(action);
+
+        if(action === "login") {
+            login();
+        }
+        if(action === "logout") {
+            logout();
+        }
+    }
+
+    if(isAuthenticated) {
+        const user = await auth0Client.getUser();
+        console.log("user", user);
+        localStorage.setItem('user', JSON.stringify(user));
+        return;
+    }
+
+    if (query.includes("code=") && query.includes("state=")) {
+        console.log("Called handleRedirectCallback");
+        console.log(query);
+
+        await auth0Client.handleRedirectCallback();
+
+        updateUI();
+
+        // Use replaceState to redirect the user away and remove the querystring parameters
+        window.history.replaceState({}, document.title, "/");
+    } else {
+        login();
+    }
+};
+
+const login = async () => {
+    await auth0Client.loginWithRedirect({
+        authorizationParams: {
+            redirect_uri: window.location.origin
+        }
+    });
+};
+const logout = () => {
+    auth0Client.logout({
+        logoutParams: {
+            returnTo: window.location.origin
+        }
+    });
+};
 
 import setAppDefaults from "./config/appDefaults";
 import renderViews from "./config/renderViews";
@@ -85,75 +155,3 @@ if (window.Notification) {
 let options;
 const myModal = new Modal(document.getElementById('login_modal'), options)
 myModal.hide();
-
-// Login button
-document.getElementById("login_modal__close").addEventListener("click", function () {
-    myModal.hide();
-});
-document.getElementById("login_modal__submit").addEventListener("click", function () {
-    function request_body(path, body, callback_result, method = 'POST', authed = true, callback_error = null) {
-        let requestOptions = {
-            method: method,
-            body: body,
-            redirect: 'follow',
-        };
-
-        let api_url = localStorage.getItem("api_url") || "https://api-cal.transgirl.space/api";
-
-        try {
-            fetch(api_url + path, requestOptions)
-                .then(response => response.text())
-                .then(result => {
-                    if (authed) {
-                        let json = JSON.parse(result);
-                        if (json.error === "Un-Authorised!") {
-                            return "Un-Authorised!"
-                        }
-                        callback_result(result);
-                    } else {
-                        callback_result(result);
-                    }
-                });
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    function login() {
-        console.log("Called login");
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        let urlencoded = new URLSearchParams();
-        urlencoded.append("email", email);
-        urlencoded.append("password", password);
-        urlencoded.append("refresh", "false");    // Prevent invalidating previous tokens
-
-        request_body("/login", urlencoded, function (result) {
-            console.log("Server events");
-            let data = JSON.parse(result)["response"];
-
-            if(data === "Un-Authenticated") {
-                localStorage.setItem('user', "");
-
-                document.getElementById('password').value = "";
-
-                // TODO: Add notification for failed login attempts
-
-                return;
-            }
-            // console.log(data);
-
-            localStorage.setItem('user', JSON.stringify(data));
-
-            // const overlay = document.getElementById('overlay');
-            // overlay.style.display = 'none';
-
-            myModal.hide();
-
-
-        }, 'POST');
-    }
-
-    login();
-});
